@@ -372,13 +372,34 @@ var GAMES=[
  rules:['Draw a card and read it out loud.','Everyone picks one. No "neither."','Each person has to give a reason.','Best reason picks who reads the next card.'],
  body:function(st){return [deck(st,'d',WYR,{empty:'Tap Draw for a Would You Rather'})]}},
 
-{id:'fortune',group:'all',ico:'🌀',title:'Fortunately / Unfortunately',blurb:'Build a story one sentence at a time.',
- phones:'One phone, held by anyone. It shows whose turn it is.',
- rules:['Go around the car. Each person adds one sentence to the story.','Sentences switch between "Fortunately..." and "Unfortunately..." every turn.','Use a starter card or make up your own.','The story ends when someone laughs too hard to keep going.'],
- body:function(st){st.t=st.t||0;var ps=players();var who=ps[st.t%ps.length].label;var word=st.t%2===0?'Unfortunately...':'Fortunately...';
+{id:'fortune',group:'all',ico:'🌀',title:'Fortunately / Unfortunately',blurb:'Build a story one sentence at a time, then read it back.',
+ phones:'One phone. Whoever holds it can type each sentence as it is said (optional), then read the whole story out loud at the end.',
+ rules:['Go around the car. Each person adds one sentence to the story.','Sentences switch between "Fortunately..." and "Unfortunately..." every turn.','Use a starter card or make up your own.','Typing is optional. The phone-holder can type each sentence as it is said and tap Add, or just tap Next to play out loud only.','When the story is done (or someone laughs too hard to keep going), tap Read the whole story and read it to the car.'],
+ body:function(st){st.t=st.t||0;st.lines=st.lines||[];var ps=players();var who=ps[st.t%ps.length].label;var word=st.t%2===0?'Unfortunately':'Fortunately';
+  var sd=st.start||{};var starter=sd.cur!=null&&sd.cur>=0?FORTUNE[sd.cur]:null;
+  if(st.reading){
+    return [h('div',{class:'card'},h('h3',null,'The whole story'),
+      starter?h('p',{style:'font-size:20px;line-height:1.5;margin:6px 0 12px'},starter.replace(/\.\.\.$/,'.')):null,
+      st.lines.map(function(l){return h('p',{style:'font-size:20px;line-height:1.5;margin:0 0 12px'},l.text,h('span',{class:'muted',style:'font-size:13px'},'  - '+l.who))}),
+      !starter&&!st.lines.length?h('div',{class:'prompt dim'},'Nothing typed yet.'):null),
+      h('button',{class:'btn wide',onclick:act(function(){st.reading=false})},'Back to the game')];
+  }
+  var prefix=word+', ';
+  var inp=h('input',{value:prefix,placeholder:prefix});
+  function add(){var v=inp.value.trim();if(v&&v.replace(/[,.\s]+$/,'')!==word){st.lines.push({who:who,turn:st.t,text:/[.!?]$/.test(v)?v:v+'.'})}st.t++;save();refresh()}
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')add()});
   return [deck(st,'start',FORTUNE,{title:'Starter',empty:'Tap Draw for a story starter'}),
-    h('div',{class:'card'},h('div',{class:'sub'},'Turn '+(st.t+1)),h('div',{class:'prompt',style:'min-height:0'},who+': "'+word+'"'),
-      h('div',{class:'row center'},h('button',{class:'btn',onclick:act(function(){st.t++})},'Next sentence'),h('button',{class:'btn alt',onclick:act(function(){st.t=0})},'Restart')))]}},
+    h('div',{class:'card'},h('div',{class:'sub'},'Turn '+(st.t+1)+(st.lines.length?' - '+st.lines.length+' typed so far':'')),
+      h('div',{class:'prompt',style:'min-height:0'},who+': "'+word+'..."'),
+      inp,h('div',{class:'spacer'}),
+      h('div',{class:'row center'},
+        h('button',{class:'btn',onclick:add},'Add + next'),
+        h('button',{class:'btn alt',onclick:act(function(){st.t++})},'Next (no typing)')),
+      h('div',{class:'spacer'}),
+      h('div',{class:'row center'},
+        h('button',{class:'btn alt',disabled:st.t>0?null:true,onclick:act(function(){if(st.t<=0)return;st.t--;var l=st.lines[st.lines.length-1];if(l&&l.turn===st.t)st.lines.pop()})},'Undo last'),
+        h('button',{class:'btn alt',onclick:act(function(){if(!st.lines.length||confirm('Start a new story? This clears the typed story.')){st.t=0;st.lines=[];st.reading=false}})},'New story'))),
+    h('button',{class:'btn sun wide',style:'font-size:19px;min-height:56px',onclick:act(function(){st.reading=true;window.scrollTo(0,0)})},'📖 Read the whole story')]}},
 
 {id:'lastletter',group:'all',ico:'🔗',title:'Last Letter',blurb:'Each answer starts with the last letter of the one before.',
  phones:'One phone runs the timer and marks who is out.',
