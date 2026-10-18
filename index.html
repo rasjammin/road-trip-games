@@ -385,7 +385,7 @@ var GAMES=[
  rules:['On your turn, say three things about this weekend. Two are true, one is a lie.','Everyone guesses the lie.','Each person who guesses right gets a point. If nobody gets it, you get 2 points.','Stuck? Draw a topic card.'],
  body:function(st){return [turnPicker(st,'turn','Telling now'),deck(st,'topic',TWO_TRUTHS,{title:'Topic idea',empty:'Tap Draw for a topic'}),scoreboard(st,'s',players(),[1,2])]}},
 
-{id:'movie',group:'big',ico:'🎬',title:'Movie Chain',blurb:'Actor, movie, actor, movie... until someone breaks.',
+{id:'movie',group:'all',ico:'🎬',title:'Movie Chain',blurb:'Actor, movie, actor, movie... until someone breaks.',
  phones:'One phone runs the timer and types in the chain.',
  rules:['First person names an actor.','Next person names a movie that actor was in.','Next names a different actor in that movie. Then a movie with that actor. Keep going.','No repeats. Stuck for 10 seconds, or wrong, and you are out.','Challenges are settled by Google at the next stop. Or by Dad, if he is confident.'],
  body:function(st){st.chain=st.chain||[];
@@ -543,7 +543,7 @@ var PLAN=[
    ['twentyq',"Quick rounds. Hand your phone to whoever is guessing."]]},
  {stage:'Middle of the drive: games',items:[
    ['categories',"Fast and loud. You tap Spin and read it out."],
-   ['movie',"Pearce vs. Danielle. Stand back."],
+   ['movie',"Everybody plays. Dad too, by voice."],
    ['ghost',"Spelling battle for the big kids."],
    ['lastletter',"Try Texas towns for hard mode."]]},
  {stage:'Parents in the game',items:[
