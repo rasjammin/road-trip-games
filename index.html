@@ -272,17 +272,19 @@ var GAMES=[
 {id:'cows',group:'spot',ico:'🐄',title:'My Cows',blurb:'1 point for every cow pasture on your side. Cemeteries cost you a quarter.',
  phones:"One phone keeps score: Natalie's. Everyone else just shouts out cow pastures on their side.",
  rules:['Each side of the car scores on their side of the road.','1 point for every pasture or ranch with cows in it. 2 cows or 200 cows, it is still 1 point.','Pass a cemetery on your side and you lose a quarter of your points (rounded up, so a cemetery always costs at least 1).','Most points when you pull into the driveway wins.','Arguments about whether it was a cow or a horse are settled by the driver.'],
- body:function(st){st.left=st.left||0;st.right=st.right||0;st.lname=st.lname||'Left side';st.rname=st.rname||'Right side';
-  function side(k,nk){return h('div',{class:'card'},
+ body:function(st){st.left=st.left||0;st.right=st.right||0;st.lname=st.lname||'Left side';st.rname=st.rname||'Right side';st.hist=st.hist||{left:[],right:[]};st.log=st.log||[];
+  function side(k,nk){var hist=st.hist[k];var last=hist[hist.length-1];return h('div',{class:'card'},
     h('input',{value:st[nk],onchange:function(e){st[nk]=e.target.value;save()}}),
     h('div',{class:'big'},st[k]),
-    h('div',{class:'row center'},h('button',{class:'btn',style:'min-width:150px;font-size:20px',onclick:act(function(){st[k]+=1})},'\uD83D\uDC04 +1 pasture')),
+    h('div',{class:'row center'},h('button',{class:'btn',style:'min-width:150px;font-size:20px',onclick:act(function(){st[k]+=1;hist.push({t:'plus'})})},'\uD83D\uDC04 +1 pasture')),
     h('div',{class:'spacer'}),
-    h('div',{class:'row center'},h('button',{class:'btn alt',style:'font-size:14px;min-height:40px;padding:8px 14px',onclick:act(function(){st[k]=Math.max(0,st[k]-1)})},'Undo'),
-      h('button',{class:'btn warn',onclick:act(function(){var loss=Math.ceil(st[k]/4);if(!loss)return;if(confirm('Cemetery on '+st[nk]+'? Lose '+loss+' of '+st[k]+' points.')){st.log=(st.log||[]).concat(st[nk]+' lost '+loss+(loss===1?' point (':' points (')+st[k]+' to '+(st[k]-loss)+')');st[k]-=loss}})},'Cemetery!')))}
+    h('div',{class:'row center'},h('button',{class:'btn alt',style:'font-size:14px;min-height:40px;padding:8px 14px',disabled:last?null:true,onclick:act(function(){var a=hist.pop();if(!a)return;
+        if(a.t==='plus')st[k]=Math.max(0,st[k]-1);
+        else{st[k]+=a.loss;var i=st.log.lastIndexOf(a.msg);if(i>=0)st.log.splice(i,1)}})},last&&last.t==='cem'?'Undo cemetery':'Undo'),
+      h('button',{class:'btn warn',onclick:act(function(){var loss=Math.ceil(st[k]/4);if(!loss)return;if(confirm('Cemetery on '+st[nk]+'? Lose '+loss+' of '+st[k]+' points.')){var msg=st[nk]+' lost '+loss+(loss===1?' point (':' points (')+st[k]+' to '+(st[k]-loss)+')';st.log.push(msg);hist.push({t:'cem',loss:loss,msg:msg});st[k]-=loss}})},'Cemetery!')))}
   return [h('div',{class:'herd'},side('left','lname'),side('right','rname')),
     st.log&&st.log.length?h('div',{class:'card'},h('h3',null,'Cemetery casualties'),st.log.map(function(l){return h('div',{class:'muted'},'☠ '+l)})):null,
-    h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Start a new game?')){st.left=0;st.right=0;st.log=[]}})},'New game')]}},
+    h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Start a new game?')){st.left=0;st.right=0;st.log=[];st.hist={left:[],right:[]}}})},'New game')]}},
 
 {id:'bingo',group:'spot',ico:'🎯',title:'Texas Road Bingo',blurb:'Your own card of things on Texas roads. Five in a row wins.',
  phones:'Everyone on their own phone. Tap your own name first so you get your own card. Dad is driving, so he sits this one out.',
