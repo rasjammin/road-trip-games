@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Road Trip Games</title>
+<meta name="theme-color" content="#0e7c86">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Road Trip">
+<style>
+:root{--sea:#0e7c86;--sea2:#17a9a6;--sand:#f7eedc;--sun:#ff8a3d;--ink:#1d2b36;--card:#fff;--muted:#6b7a86;--line:#e6ebee;--bad:#d64545;--soft:#e7eff1}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--sand);color:var(--ink);-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+header{background:linear-gradient(135deg,var(--sea),var(--sea2));color:#fff;padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top));position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+header h1{font-size:19px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header a,header button{background:rgba(255,255,255,.22);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:15px;text-decoration:none;font-weight:600}
+main{padding:12px 14px 80px;max-width:720px;margin:0 auto}
+.hero{background:linear-gradient(160deg,#fff7ea,#ffe2c7);border-radius:16px;padding:16px;margin:4px 0 6px}
+.hero b{font-size:20px;display:block;margin-bottom:4px}
+.group h2{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:22px 4px 6px}
+.tile{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:13px 14px;margin:8px 0;box-shadow:0 1px 3px rgba(0,0,0,.07);text-decoration:none;color:inherit}
+.tile .ico{font-size:28px;width:38px;text-align:center;flex:none}
+.tile b{display:block;font-size:17px}
+.tile span{color:var(--muted);font-size:14px;line-height:1.3}
+.card{background:var(--card);border-radius:14px;padding:14px 16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.card h3{margin:0 0 8px;font-size:16px}
+details.rules summary{font-weight:700;font-size:16px;cursor:pointer;list-style:none}
+details.rules summary::-webkit-details-marker{display:none}
+details.rules summary:after{content:" (tap to hide)";color:var(--muted);font-weight:400;font-size:13px}
+details.rules:not([open]) summary:after{content:" (tap to show)"}
+.rules ul{margin:8px 0 0;padding-left:20px}
+.rules li{margin:6px 0;line-height:1.4}
+.title{font-size:26px;font-weight:800;margin:8px 0 2px}
+.blurb{color:var(--muted);margin:0 0 4px}
+.btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-size:16px;font-weight:700;background:var(--sea);color:#fff;min-height:46px;cursor:pointer}
+.btn.alt{background:var(--soft);color:var(--ink)}
+.btn.warn{background:var(--bad)}
+.btn.sun{background:var(--sun)}
+.btn.wide{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.center{justify-content:center}
+.row > .grow{flex:1}
+.big{font-size:60px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;line-height:1.1;margin:6px 0}
+.prompt{font-size:22px;font-weight:700;text-align:center;line-height:1.3;padding:16px 6px;min-height:96px;display:flex;align-items:center;justify-content:center}
+.prompt.dim{color:var(--muted);font-weight:500;font-size:18px}
+.sub{font-size:13px;color:var(--muted);text-align:center}
+.score{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid var(--line)}
+.score:last-child{border-bottom:0}
+.score .name{flex:1;font-size:17px;font-weight:600}
+.score .n{min-width:46px;text-align:center;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.score button{min-width:44px;height:44px;border-radius:22px;border:0;font-size:17px;font-weight:700;background:var(--soft);color:var(--ink);padding:0 10px;cursor:pointer}
+.score button.plus{background:var(--sea);color:#fff}
+.score.lead .name:after{content:" \1F451"}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--sea);background:#fff;color:var(--sea);border-radius:999px;padding:8px 14px;font-size:16px;font-weight:700;cursor:pointer}
+.chip.on{background:var(--sea);color:#fff}
+.chip.out{border-color:#ccc;color:#aaa;text-decoration:line-through;background:#f3f3f3}
+.chip small{font-weight:800;margin-left:6px}
+.bingo{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.bingo button{aspect-ratio:1;border:0;border-radius:8px;background:#fff;font-size:10.5px;overflow-wrap:anywhere;hyphens:auto;line-height:1.15;padding:3px;font-weight:700;color:var(--ink);box-shadow:inset 0 0 0 1px #d8e0e4;cursor:pointer;overflow:hidden}
+.bingo button.on{background:var(--sun);color:#fff;box-shadow:none}
+.bingo button.free{background:var(--sea);color:#fff;box-shadow:none}
+.bingo button.win{outline:3px solid #ffd23f;outline-offset:-3px}
+.letters{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.letters div{text-align:center;padding:8px 0;border-radius:8px;background:var(--soft);font-weight:800;color:#9aa7b0}
+.letters div.done{background:var(--sea);color:#fff}
+.letters div.now{background:var(--sun);color:#fff}
+.plates{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:6px}
+.plates button{border:0;border-radius:9px;padding:9px 4px;font-size:13px;font-weight:700;background:#fff;box-shadow:inset 0 0 0 1px #d8e0e4;color:var(--ink);cursor:pointer}
+.plates button.on{background:var(--sea);color:#fff;box-shadow:none}
+.banner{background:var(--sun);color:#fff;text-align:center;font-size:26px;font-weight:800;border-radius:14px;padding:12px;margin:10px 0;animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(.85)}70%{transform:scale(1.05)}100%{transform:scale(1)}}
+.herd{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.herd .card{margin:0;text-align:center}
+.herd input{text-align:center;font-weight:700}
+.ghost{font-size:22px;font-weight:800;letter-spacing:.15em;color:var(--bad);min-width:96px;text-align:center}
+.strikes{font-size:44px;font-weight:900;color:var(--bad);text-align:center;letter-spacing:.2em;min-height:56px}
+input,select,textarea{font-size:16px;padding:10px;border-radius:10px;border:1px solid #cdd6db;width:100%;font-family:inherit;background:#fff}
+label{font-size:14px;color:var(--muted);display:block;margin:8px 0 4px}
+.muted{color:var(--muted);font-size:14px}
+.chain{margin:8px 0 0;padding:0;list-style:none}
+.chain li{padding:6px 0;border-bottom:1px dashed var(--line)}
+.secret{font-size:30px;font-weight:800;letter-spacing:.12em;text-align:center;margin:8px 0}
+.pill{display:inline-block;background:var(--soft);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700;color:var(--muted)}
+.result{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:16px}
+.result:first-child{font-weight:800}
+.spacer{height:8px}
+.toggle{display:flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.toggle button{flex:1;border:0;border-radius:9px;padding:10px;font-size:15px;font-weight:700;background:transparent;color:var(--muted);cursor:pointer}
+.toggle button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+</style>
+</head>
+<body>
+<header id="hdr"></header>
+<main id="app"></main>
+<script>
+(function(){
+'use strict';
+
+/* ---------- state ---------- */
+var KEY='rtg-v1';
+var S;
+try{S=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){S={}}
+S.games=S.games||{};
+var DEFAULT_PLAYERS=[['Dad','parents'],['Mom','parents'],['Pearce','kids'],['Danielle','kids'],['Kaitlan','kids'],['Aria','kids']];
+if(!S.players)S.players=DEFAULT_PLAYERS.map(function(p){return{name:p[0],team:p[1]}});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function G(id){return S.games[id]||(S.games[id]={})}
+function players(){return S.players.map(function(p,i){return{id:'p'+i,label:p.name,team:p.team}})}
+function kids(){return players().filter(function(p){return p.team==='kids'})}
+function nameOf(id){var p=players().filter(function(p){return p.id===id})[0];return p?p.label:id}
+function teams(){return [{id:'parents',label:'Parents'},{id:'kids',label:'Kids'}]}
+
+/* ---------- helpers ---------- */
+function h(tag,attrs){
+  var el=document.createElement(tag);
+  if(attrs)for(var k in attrs){var v=attrs[k];if(v==null||v===false)continue;
+    if(k.slice(0,2)==='on')el.addEventListener(k.slice(2),v);
+    else if(k==='class')el.className=v;
+    else if(k==='value')el.value=v;
+    else el.setAttribute(k,v===true?'':v)}
+  var kidsArr=[].slice.call(arguments,2);
+  (function add(list){list.forEach(function(c){if(c==null||c===false)return;if(Array.isArray(c))return add(c);el.appendChild(c.nodeType?c:document.createTextNode(String(c)))})})(kidsArr);
+  return el}
+function act(fn){return function(e){fn(e);save();refresh()}}
+function rnd(n){return Math.floor(Math.random()*n)}
+function shuffle(a,r){r=r||Math.random;a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function seeded(str){var x=1779033703^str.length;for(var i=0;i<str.length;i++){x=Math.imul(x^str.charCodeAt(i),3432918353);x=x<<13|x>>>19}
+  return function(){x=Math.imul(x^x>>>16,2246822507);x=Math.imul(x^x>>>13,3266489909);x^=x>>>16;return(x>>>0)/4294967296}}
+function fmt(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+var AC=null;
+function beep(f,d){f=f||880;d=d||.15;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.3,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d)}catch(e){}
+  if(navigator.vibrate)try{navigator.vibrate(d>.3?300:60)}catch(e){}}
+
+/* ---------- reusable pieces ---------- */
+function rulesCard(rules){
+  return h('details',{class:'card rules',open:true},h('summary',null,'How to play'),h('ul',null,rules.map(function(r){return h('li',null,r)})))}
+
+function scoreboard(st,key,entities,steps){
+  steps=steps||[1];st[key]=st[key]||{};var sc=st[key];
+  var max=-Infinity;entities.forEach(function(e){max=Math.max(max,sc[e.id]||0)});
+  return h('div',{class:'card'},h('h3',null,'Score'),
+    entities.map(function(e){var n=sc[e.id]||0;
+      return h('div',{class:'score'+(n>0&&n===max?' lead':'')},
+        h('div',{class:'name'},e.label),
+        h('button',{onclick:act(function(){sc[e.id]=(sc[e.id]||0)-1})},'-1'),
+        h('div',{class:'n'},n),
+        steps.map(function(s){return h('button',{class:'plus',onclick:act(function(){sc[e.id]=(sc[e.id]||0)+s})},'+'+s)}))}),
+    h('div',{class:'spacer'}),
+    h('button',{class:'btn alt',onclick:act(function(){if(confirm('Reset the scores?'))st[key]={}})},'Reset scores'))}
+
+function deck(st,key,items,opts){
+  opts=opts||{};st[key]=st[key]||{cur:-1,seen:[]};var d=st[key];
+  if(d.cur>=items.length)d.cur=-1;
+  var text=d.cur<0?(opts.empty||'Tap Draw for a card'):items[d.cur];
+  return h('div',{class:'card'},
+    opts.title?h('h3',null,opts.title):null,
+    h('div',{class:'prompt'+(d.cur<0?' dim':'')},text),
+    h('div',{class:'row center'},
+      h('button',{class:'btn',onclick:act(function(){
+        var pool=[];for(var i=0;i<items.length;i++)if(d.seen.indexOf(i)<0)pool.push(i);
+        if(!pool.length){d.seen=[];for(i=0;i<items.length;i++)if(i!==d.cur)pool.push(i)}
+        d.cur=pool[rnd(pool.length)];d.seen.push(d.cur)})},d.cur<0?'Draw':(opts.next||'Next')),
+      opts.extra||null),
+    h('div',{class:'sub'},d.seen.length+' of '+items.length+' used'))}
+
+var T={};
+function timer(key,secs,o){
+  o=o||{};var t=T[key];
+  if(!t||t.secs!==secs)t=T[key]={secs:secs,left:secs,el:0,run:false,iv:0,last:0};
+  function show(){var d=document.getElementById('tm-'+key);if(d)d.textContent=o.up?fmt(t.el):fmt(t.left);
+    var b=document.getElementById('tb-'+key);if(b)b.textContent=t.run?'Pause':((o.up?t.el>0:t.left>0&&t.left<t.secs)?'Resume':'Start')}
+  function tick(){var now=Date.now(),dt=(now-t.last)/1000;t.last=now;
+    if(o.up){t.el+=dt}else{var prev=t.left;t.left=Math.max(0,t.left-dt);
+      if(o.beepAt&&t.left>0&&Math.ceil(t.left)<Math.ceil(prev)&&Math.ceil(t.left)<=o.beepAt)beep(660,.08);
+      if(t.left<=0){stop();beep(440,.7);if(o.onEnd)o.onEnd()}}
+    show()}
+  function start(){if(t.run)return;if(!o.up&&t.left<=0)t.left=t.secs;t.run=true;t.last=Date.now();t.iv=setInterval(tick,100);show()}
+  function stop(){t.run=false;clearInterval(t.iv);show()}
+  function reset(){stop();t.left=t.secs;t.el=0;show()}
+  t.start=start;t.stop=stop;t.reset=reset;
+  setTimeout(show,0);
+  return h('div',null,
+    h('div',{class:'big',id:'tm-'+key},o.up?fmt(t.el):fmt(t.left)),
+    o.hideButtons?null:h('div',{class:'row center'},
+      h('button',{class:'btn',id:'tb-'+key,onclick:function(){t.run?stop():start()}},'Start'),
+      h('button',{class:'btn alt',onclick:reset},'Reset')))}
+
+function turnPicker(st,key,label){
+  var ps=players();st[key]=st[key]||0;var i=st[key]%ps.length;
+  return h('div',{class:'card'},
+    h('div',{class:'sub'},label||'Up now'),
+    h('div',{class:'prompt',style:'min-height:0;padding:6px'},ps[i].label),
+    h('div',{class:'row center'},
+      h('button',{class:'btn alt',onclick:act(function(){st[key]=(st[key]+ps.length-1)%ps.length})},'Back'),
+      h('button',{class:'btn',onclick:act(function(){st[key]=(st[key]+1)%ps.length})},'Next person')))}
+
+function outTracker(st,key,title){
+  st[key]=st[key]||{};var out=st[key];var ps=players();
+  var alive=ps.filter(function(p){return!out[p.id]});
+  return h('div',{class:'card'},
+    h('h3',null,title||'Tap a name when they are out'),
+    alive.length===1?h('div',{class:'banner'},alive[0].label+' wins!'):null,
+    h('div',{class:'chips'},ps.map(function(p){return h('button',{class:'chip'+(out[p.id]?' out':''),onclick:act(function(){out[p.id]=!out[p.id]})},p.label)})),
+    h('div',{class:'spacer'}),
+    h('button',{class:'btn alt',onclick:act(function(){st[key]={}})},'New round'))}
+
+function chipPick(options,cur,onpick){
+  return h('div',{class:'chips'},options.map(function(o){return h('button',{class:'chip'+(o===cur?' on':''),onclick:act(function(){onpick(o)})},o)}))}
+
+function twentyQ(st,cats){
+  st.n=st.n||0;st.yes=st.yes||0;st.no=st.no||0;
+  var done=st.n>=20;
+  return [
+    cats?deck(st,'cat',cats,{title:'Pick a category (optional)',empty:'Tap Draw for a category'}):null,
+    h('div',{class:'card'},
+      h('div',{class:'sub'},'Questions asked'),
+      h('div',{class:'big'},st.n+' / 20'),
+      st.got?h('div',{class:'banner'},'Got it in '+st.got+'!'):done?h('div',{class:'banner'},'Out of questions. The thinker wins!'):null,
+      h('div',{class:'row center'},
+        h('button',{class:'btn',disabled:done||st.got?true:null,onclick:act(function(){st.n++;st.yes++})},'Yes'),
+        h('button',{class:'btn',disabled:done||st.got?true:null,onclick:act(function(){st.n++;st.no++})},'No'),
+        h('button',{class:'btn alt',disabled:done||st.got?true:null,onclick:act(function(){st.n++})},'Sort of')),
+      h('div',{class:'sub'},st.yes+' yes, '+st.no+' no'),
+      h('div',{class:'spacer'}),
+      h('div',{class:'row center'},
+        h('button',{class:'btn sun',onclick:act(function(){st.got=st.n||1})},'Guessed it!'),
+        h('button',{class:'btn alt',onclick:act(function(){st.n=0;st.yes=0;st.no=0;st.got=0})},'New round')))]}
+
+function secretBox(st,key,placeholder){
+  st[key]=st[key]||{text:'',show:false};var s=st[key];
+  return h('div',null,
+    s.show?h('div',{class:'secret'},s.text||'(nothing written)'):
+      h('input',{type:'password',placeholder:placeholder||'Type it secretly',value:s.text,autocomplete:'off',oninput:function(e){s.text=e.target.value;save()}}),
+    h('div',{class:'spacer'}),
+    h('button',{class:'btn '+(s.show?'alt':'sun'),onclick:act(function(){s.show=!s.show})},s.show?'Hide':'Reveal'))}
+
+/* ---------- content ---------- */
+var BINGO=['Wind turbine','Oil pumpjack',"Buc-ee's billboard",'Whataburger','Longhorn','Hawk on a fence post','Round hay bale','Texas flag on a house','Boat being towed','Out-of-state plate','Dairy Queen','Water tower with a town name','Horse','Goat','Deer','Cemetery','Tractor','Dog in a truck bed','Motorcycle','RV or camper','Train','Bridge over a river',"Don't Mess with Texas sign",'Rest area sign','75 mph speed limit','Police car','Fireworks stand','Lawyer billboard','Feed store','Cattle trailer','Old windmill','Oil storage tanks','Church steeple','Sonic','Produce stand','Donkey','Birds on a power line','Hay trailer','Kayak or surfboard on a car','Historical marker'];
+var STATES=['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
+var BONUS_PLATES=['Washington DC','Mexico','Canada','Military / Gov'];
+var HOTSEAT=['What is the best day you can remember?','If you could live anywhere in the world, where?','Who is your favorite teacher ever, and why?','What is the most embarrassing thing that happened to you this year?','You have $1,000 and must spend it today. What do you buy?','What is one thing you would change about family road trips?','Which person in this car are you most like?','What is your dream job right now?','What song are you secretly embarrassed to love?','What is the worst food you have ever eaten?','If you could swap lives with anyone in this car for a day, who?','What is the most-used app on your phone?','What is something you are proud of that nobody noticed?','What is your hidden talent?','What was the best part of this weekend?','If you had a theme song, what would it be?','What is the last thing that made you laugh really hard?','What is something you want to learn this year?','Who is the funniest person in this car?','What scares you the most?','What does your perfect Saturday look like?','If you could be famous for one thing, what would it be?','What is one rule at our house you would change?','Where do you think you will be in 10 years?','What is the best gift you ever got?','What is your most unpopular opinion?','If you could have any superpower, which one and why?','What is a habit you wish you could break?'];
+var WYR=['Be a dolphin or a pelican?','Swim with a jellyfish or a crab in your swimsuit?','Live on the beach or in the mountains?','Have sand in your shoes forever or sunscreen in your eyes once a day?','Only eat Whataburger or only eat Chick-fil-A for a year?','Surf a giant wave or ride the biggest roller coaster?','Find a treasure chest or a message in a bottle?','Never go in the ocean again or never go in a pool again?','Have a pet seagull or a pet sea turtle?','Be able to breathe underwater or fly?','Always be 10 minutes late or always 30 minutes early?','Have no phone for a month or no dessert for a year?','Be the funniest person in the room or the smartest?','Live without music or without movies?','Have a personal chef or a personal driver?','Know the future or change the past?','Be famous on TikTok or famous in history books?','Give up pizza or give up tacos?','Explore space or the deep ocean?','Be stuck in traffic for 3 hours or ride in silence for 1 hour?','Have a giant water slide at home or a movie theater?','Be a kid forever or a grown-up right now?','Talk to animals or speak every language?','Never be cold again or never be hot again?','Eat a sand sandwich or drink a cup of salt water?','Have a beach house or a cabin in the woods?','Meet a mermaid or meet a pirate?','Win the lottery or have the perfect job?'];
+var FORTUNE=['Fortunately, we found a treasure chest buried on the beach...','Fortunately, a dolphin swam right up to our boat...','Fortunately, Buc-ee\'s gave us free brisket for life...','Fortunately, the car started flying...','Fortunately, we found a secret island no one had ever seen...','Fortunately, a seagull dropped a golden ticket in our lap...','Fortunately, we won a contest to meet our favorite singer...','Fortunately, the dog learned how to talk...'];
+var LAST_CATS=['Places (anywhere)','Animals','Foods','Texas towns (hard mode)','Singers and bands','Movies'];
+var TWO_TRUTHS=['Something you ate this weekend','Something you saw on the beach','Something that happened in the water','Something you did when nobody was watching','Something you bought','Something someone said','Something you found','Something that went wrong'];
+var CATEGORIES=['Fast food chains','Animals','Things at the beach','Cereals','Sports teams','Movies','TV shows','Things in a kitchen','Fruits and vegetables','Boy names','Girl names','Cities','Countries','Things that are cold','Songs','Candy','Board games','Things in a school','Jobs','Car brands','Things you pack for a trip','Pizza toppings','Disney characters','Superheroes','Things that fly','Sea creatures',"Snacks at Buc-ee's",'Video games','Things in a bathroom','Clothing','Apps on a phone','Singers','Desserts','Things with wheels','Texas cities','Sports','Breakfast foods','Things that are green','Book titles','Things that are sticky'];
+var LETTERS='ABCDEFGHIJKLMNOPRSTW';
+var DJ_THEMES=['Beach song','Song your parents would hate','Best sing-along','Road trip anthem','Song from before you were born','Song that makes you dance','Movie soundtrack','Song with a color in the title','Country song','Song that reminds you of someone in this car','Guilty pleasure','Best song to wake up to','Victory lap song','Oldest song you love','Song with a place in the title','Workout song','Song in another language','TV theme song'];
+var KNOWS_Q=["What was {X}'s first car?","What was {X}'s worst job ever?","What was {X}'s favorite food as a kid?","What was {X}'s first concert?","What was {X}'s nickname growing up?","What is {X}'s favorite movie of all time?","What did {X} want to be at age 10?","What was {X}'s favorite subject in school?","What is {X}'s biggest fear?","Where did Mom and Dad go on their first date?","What is {X}'s go-to fast food order?","What is {X}'s dream vacation?","What song would {X} pick at karaoke?","What is {X}'s favorite holiday?","What is {X}'s most-used phrase?","What is the first thing {X} bought with their own money?","What sport did {X} play growing up?","What is {X}'s least favorite chore?","Who was {X}'s celebrity crush as a teenager?","What is {X}'s favorite ice cream flavor?","What was {X}'s first phone?","What is {X}'s comfort TV show?"];
+var SONGS=[[1995,"Gangsta's Paradise",'Coolio'],[1995,'Waterfalls','TLC'],[1995,'Wonderwall','Oasis'],[1995,'You Oughta Know','Alanis Morissette'],[1996,'Macarena','Los del Rio'],[1996,'No Diggity','Blackstreet'],[1996,'Killing Me Softly','Fugees'],[1997,'MMMBop','Hanson'],[1997,'Barbie Girl','Aqua'],[1997,'Semi-Charmed Life','Third Eye Blind'],[1997,'Tubthumping','Chumbawamba'],[1997,'Mo Money Mo Problems','The Notorious B.I.G.'],[1997,'Bitter Sweet Symphony','The Verve'],[1998,'...Baby One More Time','Britney Spears'],[1998,"Gettin' Jiggy wit It",'Will Smith'],[1998,'Iris','Goo Goo Dolls'],[1998,'The Boy Is Mine','Brandy and Monica'],[1999,'No Scrubs','TLC'],[1999,'I Want It That Way','Backstreet Boys'],[1999,"Livin' la Vida Loca",'Ricky Martin'],[1999,'Genie in a Bottle','Christina Aguilera'],[1999,'All Star','Smash Mouth'],[1999,'Mambo No. 5','Lou Bega'],[1999,'Smooth','Santana ft. Rob Thomas'],[2000,'Bye Bye Bye','NSYNC'],[2000,'Oops!... I Did It Again','Britney Spears'],[2000,'Who Let the Dogs Out','Baha Men'],[2000,'The Real Slim Shady','Eminem'],[2000,'Ms. Jackson','OutKast'],[2000,'Kryptonite','3 Doors Down'],[2000,'Independent Women','Destiny\'s Child'],[2001,"Fallin'",'Alicia Keys'],[2001,'Lady Marmalade','Christina, Lil\' Kim, Mya, Pink'],[2001,'Get Ur Freak On','Missy Elliott'],[2001,"Hit 'Em Up Style",'Blu Cantrell'],[2001,'U Remind Me','Usher'],[2001,'Bootylicious','Destiny\'s Child'],[2001,'How You Remind Me','Nickelback']];
+var FEUD=['Name something Aria always packs.','Name something Dad says every road trip.','Name something Mom always has in her purse.','Name something we always forget to pack.',"Name a snack someone in this car would grab at Buc-ee's.",'Name something that always happens at the beach.','Name a chore nobody in this family wants.','Name something Pearce is always doing.',"Name something you'd find in Kaitlan's room.","Name Danielle's go-to food order.",'Name something that makes Mom laugh.','Name something Dad is always working on.','Name a song this family always sings along to.','Name a place we always stop on road trips.','Name a word that describes this weekend.','Name something that drives Dad crazy in the car.','Name a show everyone in this family has watched.','Name a rule at our house.','Name something you need for a perfect beach day.','Name the first thing someone will say when we get home.'];
+var HISTORY=['How did you two meet?','What was your first date?','What was your first apartment like?','Who said "I love you" first?','How did the proposal happen?','What was your wedding day like? What went wrong?','What jobs did you each have when you met?','What was your first car together?','Best trip you took before kids?','How did you pick our names?','What did you think the first time you held each of us?','What was the hardest year for our family, and how did you get through it?','What is a family story we have never heard?','What did you want to be when you were our age?','What was the funniest thing one of us did as a toddler?','What did your parents think when they first met each other?','What is the dumbest thing you did as a teenager?','What is one thing you hope we remember about growing up?'];
+var AWARDS=['Best Wave','Best Snack','Funniest Moment','Who Complained Most','Best Thing Found on the Beach','Most Sunburned','MVP of the Weekend'];
+
+/* ---------- games ---------- */
+var GROUPS=[
+  {id:'spot',label:'Spot it out the window'},
+  {id:'all',label:'Everybody plays'},
+  {id:'big',label:'Big-kid level'},
+  {id:'parents',label:'Parents in the game'},
+  {id:'aria',label:"Aria's turn to lead"},
+  {id:'home',label:'Home stretch'}];
+
+var GAMES=[
+{id:'cows',group:'spot',ico:'🐄',title:'My Cows',blurb:'Count cows on your side. Cemeteries wipe out your herd.',
+ rules:['Each side of the car counts the cows on their side.','Pass a cemetery on your side and you lose your whole herd. Back to zero.','Most cows when you pull into the driveway wins.','Arguments about whether it was a cow or a horse are settled by the driver.'],
+ body:function(st){st.left=st.left||0;st.right=st.right||0;st.lname=st.lname||'Left side';st.rname=st.rname||'Right side';
+  function side(k,nk){return h('div',{class:'card'},
+    h('input',{value:st[nk],onchange:function(e){st[nk]=e.target.value;save()}}),
+    h('div',{class:'big'},st[k]),
+    h('div',{class:'row center'},[1,5,10].map(function(n){return h('button',{class:'btn',onclick:act(function(){st[k]+=n})},'+'+n)})),
+    h('div',{class:'spacer'}),
+    h('div',{class:'row center'},h('button',{class:'btn alt',onclick:act(function(){st[k]=Math.max(0,st[k]-1)})},'-1'),
+      h('button',{class:'btn warn',onclick:act(function(){if(confirm('Cemetery on '+st[nk]+'? Herd goes to zero.')){st.log=(st.log||[]).concat(st[nk]+' lost '+st[k]+' cows');st[k]=0}})},'Cemetery!')))}
+  return [h('div',{class:'herd'},side('left','lname'),side('right','rname')),
+    st.log&&st.log.length?h('div',{class:'card'},h('h3',null,'Cemetery casualties'),st.log.map(function(l){return h('div',{class:'muted'},'☠ '+l)})):null,
+    h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Start a new game?')){st.left=0;st.right=0;st.log=[]}})},'New game')]}},
+
+{id:'bingo',group:'spot',ico:'🎯',title:'Texas Road Bingo',blurb:'Your own card of things on Texas roads. Five in a row wins.',
+ rules:['Pick your name to get your own card. Everybody gets a different one.','Tap a square when you spot it. Call it out so it counts.','Five in a row (across, down or diagonal) wins. The middle is free.','Hard mode: blackout. Fill the whole card.'],
+ body:function(st){st.who=st.who||'p0';st.seed=st.seed||{};st.marks=st.marks||{};
+  var who=st.who,sd=st.seed[who]||0,items=shuffle(BINGO,seeded(nameOf(who)+'|'+sd)).slice(0,24);items.splice(12,0,'FREE');
+  var m=st.marks[who]||(st.marks[who]=[]);m[12]=true;
+  var lines=[];for(var i=0;i<5;i++){lines.push([0,1,2,3,4].map(function(c){return i*5+c}));lines.push([0,1,2,3,4].map(function(r){return r*5+i}))}
+  lines.push([0,6,12,18,24]);lines.push([4,8,12,16,20]);
+  var wins=lines.filter(function(l){return l.every(function(x){return m[x]})});var winCells={};wins.forEach(function(l){l.forEach(function(x){winCells[x]=1})});
+  var count=m.filter(Boolean).length;
+  return [h('div',{class:'card'},h('h3',null,'Whose card?'),h('div',{class:'chips'},players().map(function(p){return h('button',{class:'chip'+(p.id===who?' on':''),onclick:act(function(){st.who=p.id})},p.label)}))),
+    count===25?h('div',{class:'banner'},'BLACKOUT! '+nameOf(who)+' is a legend'):wins.length?h('div',{class:'banner'},'BINGO! '+nameOf(who)+' wins'):null,
+    h('div',{class:'card'},h('div',{class:'bingo'},items.map(function(it,ix){return h('button',{class:(ix===12?'free':m[ix]?'on':'')+(winCells[ix]?' win':''),onclick:ix===12?null:act(function(){m[ix]=!m[ix]})},it)}))),
+    h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Deal '+nameOf(who)+' a new card?')){st.seed[who]=sd+1;st.marks[who]=[]}})},'New card for '+nameOf(who))]}},
+
+{id:'plates',group:'spot',ico:'🚗',title:'License Plates',blurb:'How many states can you find?',
+ rules:['Tap a state when you see its plate.','Plates on trucks, trailers and RVs all count.','Bonus plates (Mexico, Canada, DC) are worth bragging rights.','Play as a car, or each person on their own phone.'],
+ body:function(st){st.f=st.f||{};var n=STATES.filter(function(s){return st.f[s]}).length;
+  function grid(list){return h('div',{class:'plates'},list.map(function(s){return h('button',{class:st.f[s]?'on':'',onclick:act(function(){st.f[s]=!st.f[s]})},s)}))}
+  return [h('div',{class:'card'},h('div',{class:'big'},n+' / 50'),n===50?h('div',{class:'banner'},'ALL 50!'):null),
+    h('div',{class:'card'},h('h3',null,'States'),grid(STATES)),
+    h('div',{class:'card'},h('h3',null,'Bonus'),grid(BONUS_PLATES)),
+    h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Clear all plates?'))st.f={}})},'Start over')]}},
+
+{id:'alpha',group:'spot',ico:'🔤',title:'Alphabet Game',blurb:'Find A to Z in order on signs.',
+ rules:['Find each letter, in order, on a sign, truck or billboard outside the car.','Call out the word you found it in.','Q and Z count from anywhere you can see, including inside the car.','Play as a car, or race each other on your own phones.'],
+ body:function(st){st.i=st.i||0;var L='ABCDEFGHIJKLMNOPQRSTUVWXYZ';var done=st.i>=26;
+  return [h('div',{class:'card'},
+    h('div',{class:'sub'},done?'':'Find a word with'),
+    h('div',{class:'big',style:'font-size:90px'},done?'🎉':L[st.i]),
+    done?h('div',{class:'banner'},'A to Z done!'):null,
+    h('div',{class:'row center'},h('button',{class:'btn alt',onclick:act(function(){st.i=Math.max(0,st.i-1)})},'Undo'),
+      h('button',{class:'btn sun',disabled:done?true:null,onclick:act(function(){st.i++})},'Found it!'))),
+    h('div',{class:'card'},h('div',{class:'letters'},L.split('').map(function(c,ix){return h('div',{class:ix<st.i?'done':ix===st.i?'now':''},c)}))),
+    h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Start over at A?'))st.i=0})},'Start over')]}},
+
+{id:'contact',group:'all',ico:'🤝',title:'Contact',blurb:'The word game the whole car can play together.',
+ rules:['One person (the word-holder) secretly picks a word and says only its first letter.','Everyone else thinks of words starting with the letters so far and gives a clue out loud: "Is it something you wear on your head?"','If another guesser knows what they mean, they shout "Contact!" and the two count down 3-2-1 and say the word together.','The word-holder can block it by guessing the clue word first: "No, it is not HAT."','If the two guessers match, the word-holder has to reveal the next letter.','Guess the secret word and you win the round. The winner is the next word-holder.'],
+ body:function(st){st.word=st.word||'';st.n=st.n||1;st.locked=!!st.locked;
+  if(!st.locked)return [h('div',{class:'card'},h('h3',null,'Word-holder: type your word (no peeking, everybody else)'),
+      h('input',{type:'password',autocomplete:'off',value:st.word,oninput:function(e){e.target.value=e.target.value.replace(/[^a-zA-Z]/g,'');st.word=e.target.value;save()}}),
+      h('div',{class:'spacer'}),
+      h('button',{class:'btn wide',onclick:act(function(){if(st.word.length>1){st.locked=true;st.n=1;st.solved=false}})},'Lock it in'))];
+  var w=st.word.toUpperCase(),shown=st.solved?w:w.slice(0,st.n);
+  return [h('div',{class:'card'},
+    h('div',{class:'sub'},st.solved?'The word was':'Letters so far'),
+    h('div',{class:'big',style:'letter-spacing:.12em'},shown+(st.solved?'':'...')),
+    st.solved?null:st.n>=w.length?h('div',{class:'banner'},'All letters out! Guessers win.'):null,
+    st.solved?null:h('div',{class:'row center'},
+      h('button',{class:'btn sun',disabled:st.n>=w.length?true:null,onclick:act(function(){st.n++})},'Contact! Next letter'),
+      h('button',{class:'btn',onclick:act(function(){st.solved=true})},'Someone guessed it'))),
+    h('button',{class:'btn alt wide',onclick:act(function(){st.locked=false;st.word='';st.solved=false;st.n=1})},'New word (next word-holder)')]}},
+
+{id:'hotseat',group:'all',ico:'🔥',title:'Hot Seat',blurb:'Three minutes in the seat. Everyone asks. Two passes.',
+ rules:['One person is in the hot seat for 3 minutes.','Everyone else asks anything they want (draw a card if you are stuck).','The hot-seat person has to answer honestly, but gets 2 passes.','When time is up, the next person takes the seat.'],
+ body:function(st){st.passes=st.passes==null?2:st.passes;
+  return [turnPicker(st,'turn','In the hot seat'),
+    h('div',{class:'card'},timer('hotseat',180,{beepAt:3}),
+      h('div',{class:'spacer'}),
+      h('div',{class:'row center'},h('span',{class:'pill'},'Passes left: '+st.passes),
+        h('button',{class:'btn alt',disabled:st.passes<=0?true:null,onclick:act(function(){st.passes--})},'Use a pass'),
+        h('button',{class:'btn alt',onclick:act(function(){st.passes=2;T.hotseat&&T.hotseat.reset&&T.hotseat.reset()})},'New person'))),
+    deck(st,'q',HOTSEAT,{title:'Need a question?'})]}},
+
+{id:'twentyq',group:'all',ico:'❓',title:'20 Questions',blurb:'Yes-or-no questions only. Twenty tries.',
+ rules:['One person thinks of something.','Everyone else asks yes-or-no questions. Tap the answer to count it.','Guess it within 20 questions and the guessers win. Otherwise the thinker wins.','For younger players, use "animal, vegetable or mineral." For older ones, use someone in the family or a character.'],
+ body:function(st){return twentyQ(st,['Animal','Vegetable (any food or plant)','Mineral (anything else)','Someone in the family','A character from a movie or show','A famous person','A place','Something in this car'])}},
+
+{id:'wyr',group:'all',ico:'🤔',title:'Would You Rather',blurb:'Beach edition, plus a few hard ones.',
+ rules:['Draw a card and read it out loud.','Everyone picks one. No "neither."','Each person has to give a reason.','Best reason picks who reads the next card.'],
+ body:function(st){return [deck(st,'d',WYR,{empty:'Tap Draw for a Would You Rather'})]}},
+
+{id:'fortune',group:'all',ico:'🌀',title:'Fortunately / Unfortunately',blurb:'Build a story one sentence at a time.',
+ rules:['Go around the car. Each person adds one sentence to the story.','Sentences switch between "Fortunately..." and "Unfortunately..." every turn.','Use a starter card or make up your own.','The story ends when someone laughs too hard to keep going.'],
+ body:function(st){st.t=st.t||0;var ps=players();var who=ps[st.t%ps.length].label;var word=st.t%2===0?'Unfortunately...':'Fortunately...';
+  return [deck(st,'start',FORTUNE,{title:'Starter',empty:'Tap Draw for a story starter'}),
+    h('div',{class:'card'},h('div',{class:'sub'},'Turn '+(st.t+1)),h('div',{class:'prompt',style:'min-height:0'},who+': "'+word+'"'),
+      h('div',{class:'row center'},h('button',{class:'btn',onclick:act(function(){st.t++})},'Next sentence'),h('button',{class:'btn alt',onclick:act(function(){st.t=0})},'Restart')))]}},
+
+{id:'lastletter',group:'all',ico:'🔗',title:'Last Letter',blurb:'Each answer starts with the last letter of the one before.',
+ rules:['Pick a category. First person names something in it.','The next person names something that starts with the LAST letter of that answer. Texas, then San Antonio, then Odessa...','No repeats. If you get stuck for 10 seconds, you are out.','Last one standing wins.'],
+ body:function(st){st.cat=st.cat||LAST_CATS[0];
+  return [h('div',{class:'card'},h('h3',null,'Category'),chipPick(LAST_CATS,st.cat,function(c){st.cat=c})),
+    h('div',{class:'card'},timer('lastletter',10,{beepAt:3})),
+    outTracker(st,'out')]}},
+
+{id:'twotruths',group:'all',ico:'🤥',title:'Two Truths and a Lie',blurb:'Weekend edition. Everything has to be about this trip.',
+ rules:['On your turn, say three things about this weekend. Two are true, one is a lie.','Everyone guesses the lie.','Each person who guesses right gets a point. If nobody gets it, you get 2 points.','Stuck? Draw a topic card.'],
+ body:function(st){return [turnPicker(st,'turn','Telling now'),deck(st,'topic',TWO_TRUTHS,{title:'Topic idea',empty:'Tap Draw for a topic'}),scoreboard(st,'s',players(),[1,2])]}},
+
+{id:'movie',group:'big',ico:'🎬',title:'Movie Chain',blurb:'Actor, movie, actor, movie... until someone breaks.',
+ rules:['First person names an actor.','Next person names a movie that actor was in.','Next names a different actor in that movie. Then a movie with that actor. Keep going.','No repeats. Stuck for 10 seconds, or wrong, and you are out.','Challenges are settled by Google at the next stop. Or by Dad, if he is confident.'],
+ body:function(st){st.chain=st.chain||[];
+  var inp=h('input',{placeholder:'Add the next actor or movie'});
+  function add(){var v=inp.value.trim();if(!v)return;st.chain.push(v);save();refresh()}
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')add()});
+  return [h('div',{class:'card'},timer('movie',10,{beepAt:3})),
+    h('div',{class:'card'},h('h3',null,'The chain ('+st.chain.length+' links)'),
+      h('div',{class:'row'},h('div',{class:'grow'},inp),h('button',{class:'btn',onclick:add},'Add')),
+      h('ol',{class:'chain'},st.chain.map(function(c,i){return h('li',null,(i+1)+'. '+c)})),
+      st.chain.length?h('button',{class:'btn alt',onclick:act(function(){st.chain.pop()})},'Undo last'):null),
+    outTracker(st,'out'),
+    h('button',{class:'btn alt wide',onclick:act(function(){st.chain=[];st.out={}})},'New chain')]}},
+
+{id:'ghost',group:'big',ico:'👻',title:'Ghost / Superghost',blurb:'Spell without finishing a word. Superghost lets you add to either end.',
+ rules:['Take turns adding one letter to a growing word.','If you finish a real word (4+ letters), you get a letter of G-H-O-S-T.','You must always have a real word in mind. If you think someone is bluffing, challenge them. If they cannot name a real word, they get the letter. If they can, you do.','Superghost: you can add your letter to the front OR the back.','Spell GHOST and you are out. Last one left wins.'],
+ body:function(st){st.mode=st.mode||'Ghost';st.l=st.l||{};st.frag=st.frag||'';
+  var alive=players().filter(function(p){return(st.l[p.id]||0)<5});
+  return [h('div',{class:'toggle'},['Ghost','Superghost'].map(function(m){return h('button',{class:st.mode===m?'on':'',onclick:act(function(){st.mode=m})},m)})),
+    h('div',{class:'card'},h('h3',null,'Letters so far'),
+      h('input',{value:st.frag,style:'font-size:28px;font-weight:800;letter-spacing:.15em;text-align:center;text-transform:uppercase',oninput:function(e){st.frag=e.target.value;save()}}),
+      h('div',{class:'sub'},st.mode==='Superghost'?'Add to the front or the back':'Add to the end only')),
+    alive.length===1?h('div',{class:'banner'},alive[0].label+' wins!'):null,
+    h('div',{class:'card'},players().map(function(p){var n=st.l[p.id]||0;
+      return h('div',{class:'score'},h('div',{class:'name'},p.label+(n>=5?' (out)':'')),h('div',{class:'ghost'},'GHOST'.slice(0,n)||'-'),
+        h('button',{onclick:act(function(){st.l[p.id]=Math.max(0,n-1)})},'-'),
+        h('button',{class:'plus',onclick:act(function(){st.l[p.id]=Math.min(5,n+1);st.frag=''})},'+'))})),
+    h('button',{class:'btn alt wide',onclick:act(function(){st.l={};st.frag=''})},'New game')]}},
+
+{id:'categories',group:'big',ico:'⚡',title:'Categories, 5 Seconds',blurb:'A category, a letter, five seconds. Go.',
+ rules:['Tap Spin for a category and a letter. The timer starts on its own.','The person up has 5 seconds to name something in that category starting with that letter.','Get it and you score. Miss and it passes to the next person.','Whataburger is banned. Forever.'],
+ body:function(st){
+  return [turnPicker(st,'turn'),
+    h('div',{class:'card'},
+      h('div',{class:'prompt',style:'min-height:60px;padding:6px'},st.cat||'Tap Spin'),
+      st.letter?h('div',{class:'big',style:'font-size:80px;color:var(--sun)'},st.letter):null,
+      st.cat==='Fast food chains'?h('div',{class:'sub',style:'color:var(--bad);font-weight:800'},'Whataburger is banned.'):null,
+      timer('categories',5,{beepAt:4}),
+      h('button',{class:'btn sun wide',onclick:function(){st.cat=CATEGORIES[rnd(CATEGORIES.length)];st.letter=LETTERS[rnd(LETTERS.length)];save();refresh();var t=T.categories;if(t){t.reset();t.start()}}},'Spin')),
+    scoreboard(st,'s',players())]}},
+
+{id:'dj',group:'big',ico:'🎧',title:'DJ Battle',blurb:'Everyone picks a song for the theme. The car rates it.',
+ rules:['Draw a theme.','Each person picks a song that fits and plays about 30 seconds of it.','Everyone else rates it 1 to 10 on their fingers. Add up the ratings and put them on the scoreboard.','Highest total after a few rounds is the DJ of the trip.','Ties: Aria breaks them.'],
+ body:function(st){return [deck(st,'theme',DJ_THEMES,{title:'Theme',empty:'Tap Draw for a theme'}),scoreboard(st,'s',players(),[1,5,10])]}},
+
+{id:'knows',group:'parents',ico:'👨‍👩‍👧‍👦',title:'Who Knows Mom Best / Dad Best',blurb:'The parent writes the answer secretly. The kids race to guess.',
+ rules:['Pick Mom or Dad. Draw a question.','That parent types the real answer secretly on this phone (kids look away).','Kids shout out guesses. First right answer gets a point.','Tap Reveal to settle it. Then switch parents.'],
+ body:function(st){st.who=st.who||'Mom';var X=st.who;var qs=KNOWS_Q.map(function(q){return q.replace(/\{X\}/g,X)});var key='d'+X;
+  return [h('div',{class:'toggle'},['Mom','Dad'].map(function(m){return h('button',{class:st.who===m?'on':'',onclick:act(function(){st.who=m})},'Who knows '+m+' best')})),
+    deck(st,key,qs,{empty:'Tap Draw for a question about '+X}),
+    h('div',{class:'card'},h('h3',null,X+"'s secret answer"),secretBox(st,'ans'+X+((st[key]||{}).cur),X+': type the real answer')),
+    scoreboard(st,'s',kids())]}},
+
+{id:'year',group:'parents',ico:'📻',title:'Parents vs. Kids: Guess the Year',blurb:"Your high school years vs. their playlists.",
+ rules:['Round 1: the parent DJ taps Next song (kids look away), plays it, and the kids guess the year.','Exact year: 2 points. Within one year: 1 point. Name the artist: 1 more.','Round 2: the kids DJ their own songs, and the parents guess the artist (1 point) and the title (1 point).','Years below are the year each song hit, roughly. Arguments are part of the game.'],
+ body:function(st){var d=st.d||{};var cur=d.cur;var song=cur!=null&&cur>=0?SONGS[cur]:null;
+  return [deck(st,'d',SONGS.map(function(s){return s[1]+' - '+s[2]}),{title:'Round 1: the 90s and early 2000s',empty:'Parent DJ: tap Draw (kids, look away)',next:'Next song',
+      extra:song?h('button',{class:'btn sun',onclick:act(function(){st.reveal=cur})},'Reveal year'):null}),
+    song&&st.reveal===cur?h('div',{class:'banner'},song[0]):null,
+    scoreboard(st,'s',teams(),[1,2])]}},
+
+{id:'feud',group:'parents',ico:'📋',title:'Family Feud, Car Edition',blurb:'Name what the family would say. Expect roasting.',
+ rules:['Pick a host. Everyone else splits into two teams (Parents vs. Kids works if a kid hosts).','The host reads a question. Teams take turns naming answers.','The host decides if an answer is "on the board" (would this family actually say it?). Good answer: 1 point. Perfect answer: host can give up to 5.','A bad answer is a strike. Three strikes and the other team gets one chance to steal.'],
+ body:function(st){st.x=st.x||0;
+  return [deck(st,'d',FEUD,{empty:'Host: tap Draw for a question',extra:h('button',{class:'btn alt',onclick:act(function(){st.x=0})},'Clear strikes')}),
+    h('div',{class:'card'},h('div',{class:'strikes'},'X'.repeat(st.x)||' '),
+      h('div',{class:'row center'},h('button',{class:'btn warn',disabled:st.x>=3?true:null,onclick:act(function(){st.x++;beep(180,.4)})},'Strike!'),
+        h('button',{class:'btn alt',onclick:act(function(){st.x=Math.max(0,st.x-1)})},'Undo')),
+      st.x>=3?h('div',{class:'sub',style:'font-weight:800'},'Three strikes. Other team: one chance to steal.'):null),
+    scoreboard(st,'s',teams(),[1,5])]}},
+
+{id:'history',group:'parents',ico:'📖',title:'How Did That Happen?',blurb:'The kids ask. You two tell the family stories.',
+ rules:['Kids draw a card and ask Mom and Dad the question.','Both parents answer. If your stories do not match, that is the best part.','Follow-up questions are encouraged.','No points. This one is just for the stories.'],
+ body:function(st){var qs=HISTORY.concat(kids().map(function(k){return 'What was '+k.label+' like as a baby?'}));return [deck(st,'d',qs,{empty:'Tap Draw for a question for Mom and Dad'})]}},
+
+{id:'birthday',group:'aria',ico:'🎂',title:"Aria's Birthday 20 Questions",blurb:'She thinks of something she wants. Everyone guesses.',
+ rules:['Aria thinks of something she wants for her birthday.','Everyone else gets 20 yes-or-no questions to figure it out.','Aria can say "sort of" if it is complicated.','Parents: pay attention. This is intel.'],
+ body:function(st){return twentyQ(st,null)}},
+
+{id:'awards',group:'home',ico:'🏆',title:'Weekend Awards',blurb:'The car votes on the best (and worst) of the trip.',
+ rules:['Go through each award. Everyone nominates someone and says why.','Then vote: tap a name once for each vote.','Most votes wins. Ties: Aria breaks them.','Add your own awards at the bottom.'],
+ body:function(st){st.v=st.v||{};st.extra=st.extra||[];var list=AWARDS.concat(st.extra);
+  var inp=h('input',{placeholder:'New award, like "Best Dance Move"'});
+  return [list.map(function(a){var v=st.v[a]=st.v[a]||{};var max=0;players().forEach(function(p){max=Math.max(max,v[p.id]||0)});
+      var leaders=players().filter(function(p){return max>0&&(v[p.id]||0)===max});
+      return h('div',{class:'card'},h('h3',null,'🏅 '+a),
+        h('div',{class:'chips'},players().map(function(p){return h('button',{class:'chip'+((v[p.id]||0)===max&&max>0?' on':''),onclick:act(function(){v[p.id]=(v[p.id]||0)+1})},p.label,v[p.id]?h('small',null,v[p.id]):null)})),
+        h('div',{class:'row',style:'margin-top:8px'},h('div',{class:'grow muted'},leaders.length===1?'Winner: '+leaders[0].label:leaders.length>1?'Tie! Aria breaks it.':'No votes yet'),
+          h('button',{class:'btn alt',onclick:act(function(){st.v[a]={}})},'Clear')))}),
+    h('div',{class:'card'},h('h3',null,'Add an award'),h('div',{class:'row'},h('div',{class:'grow'},inp),
+      h('button',{class:'btn',onclick:function(){var t=inp.value.trim();if(t&&list.indexOf(t)<0){st.extra.push(t);save();refresh()}}},'Add')))]}},
+
+{id:'arrival',group:'home',ico:'⏰',title:'Guess the Arrival Time',blurb:'Lock in guesses before leaving. Closest picks dinner.',
+ rules:['Before you leave the island, everyone enters a guess for what time you pull into the driveway.','Lock the guesses so nobody can change them.','Tap "We\'re home!" in the driveway.','Closest guess picks dinner.'],
+ body:function(st){st.g=st.g||{};
+  function mins(s){var p=s.split(':');return +p[0]*60+ +p[1]}
+  var res=null;
+  if(st.home){var hd=new Date(st.home),hm=hd.getHours()*60+hd.getMinutes();
+    res=players().filter(function(p){return st.g[p.id]}).map(function(p){var d=Math.abs(mins(st.g[p.id])-hm);d=Math.min(d,1440-d);return{p:p,d:d}}).sort(function(a,b){return a.d-b.d})}
+  return [h('div',{class:'card'},h('h3',null,st.locked?'Guesses (locked)':'Everyone guess'),
+      players().map(function(p){return h('div',{class:'score'},h('div',{class:'name'},p.label),
+        st.locked?h('div',{style:'font-size:20px;font-weight:800'},st.g[p.id]?to12(st.g[p.id]):'-'):
+        h('input',{type:'time',style:'max-width:150px',value:st.g[p.id]||'',onchange:function(e){st.g[p.id]=e.target.value;save()}}))}),
+      h('div',{class:'spacer'}),
+      st.locked?null:h('button',{class:'btn wide',onclick:act(function(){st.locked=true})},'Lock guesses')),
+    st.locked&&!st.home?h('button',{class:'btn sun wide',style:'font-size:22px;min-height:70px',onclick:act(function(){st.home=new Date().toISOString()})},"We're home!"):null,
+    res?h('div',{class:'card'},h('div',{class:'banner'},res.length?res[0].p.label+' picks dinner!':'Home!'),
+      h('div',{class:'sub'},'Arrived at '+new Date(st.home).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})),
+      res.map(function(r){return h('div',{class:'result'},h('span',null,r.p.label+' ('+to12(st.g[r.p.id])+')'),h('span',null,r.d===0?'exact!':r.d+' min off'))})):null,
+    h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Clear all guesses?')){st.g={};st.locked=false;st.home=null}})},'Start over')]}},
+
+{id:'quiet',group:'home',ico:'🤫',title:'The Quiet Game',blurb:"The parents' secret weapon. Save it for the last hour.",
+ rules:['Start the timer. Nobody talks.','First person to make a sound loses.','Try to beat the car record.','The driver is exempt for safety reasons. Obviously.'],
+ body:function(st){st.best=st.best||0;
+  return [h('div',{class:'card'},
+      h('div',{class:'sub'},'Silence so far'),
+      timer('quiet',0,{up:true,hideButtons:true}),
+      h('div',{class:'row center'},
+        h('button',{class:'btn',onclick:function(){var t=T.quiet;if(t){t.reset();t.start()}}},'Start'),
+        h('button',{class:'btn warn',onclick:function(){var t=T.quiet;if(!t||!t.run)return;t.stop();var s=Math.floor(t.el);beep(220,.5);
+          if(s>st.best){st.best=s;save();refresh()}}},'Someone talked!'))),
+    h('div',{class:'card'},h('div',{class:'sub'},'Car record'),h('div',{class:'big',style:'font-size:44px'},fmt(st.best)),
+      h('button',{class:'btn alt',onclick:act(function(){if(confirm('Reset the record?'))st.best=0})},'Reset record'))]}}
+];
+
+function to12(s){if(!s)return'';var p=s.split(':'),hh=+p[0],ap=hh>=12?'pm':'am';hh=hh%12||12;return hh+':'+p[1]+ap}
+
+/* ---------- views ---------- */
+var app=document.getElementById('app'),hdr=document.getElementById('hdr');
+
+function header(title,back){
+  hdr.innerHTML='';
+  if(back)hdr.appendChild(h('a',{href:'#/'},'← Games'));
+  hdr.appendChild(h('h1',null,title));
+  if(!back)hdr.appendChild(h('a',{href:'#/settings'},'Players'));}
+
+function home(){
+  header('🏖 Road Trip Games',false);
+  return [h('div',{class:'hero'},h('b',null,'Mustang Island to home'),
+      h('div',null,GAMES.length+' games for '+players().length+' players. Tap one to play.'),
+      h('div',{class:'muted',style:'margin-top:6px'},'Tip: add this to your home screen while you still have signal. It keeps working offline.')),
+    GROUPS.map(function(g){var gs=GAMES.filter(function(x){return x.group===g.id});
+      return h('div',{class:'group'},h('h2',null,g.label),gs.map(function(x){
+        return h('a',{class:'tile',href:'#/g/'+x.id},h('div',{class:'ico'},x.ico),h('div',null,h('b',null,x.title),h('span',null,x.blurb)))}))})]}
+
+function gameView(id){
+  var g=GAMES.filter(function(x){return x.id===id})[0];if(!g)return home();
+  header(g.title,true);
+  var st=G(id);
+  return [h('div',{class:'title'},g.ico+' '+g.title),h('p',{class:'blurb'},g.blurb),rulesCard(g.rules),g.body(st)]}
+
+function settings(){
+  header('Players',true);
+  return [h('div',{class:'card'},h('h3',null,'Who is in the car'),
+      S.players.map(function(p,i){return h('div',{class:'row',style:'margin:6px 0'},
+        h('div',{class:'grow'},h('input',{value:p.name,onchange:function(e){p.name=e.target.value.trim()||p.name;save()}})),
+        h('select',{style:'width:auto',onchange:function(e){p.team=e.target.value;save()}},
+          h('option',{value:'parents',selected:p.team==='parents'?true:null},'Parent'),
+          h('option',{value:'kids',selected:p.team==='kids'?true:null},'Kid')))}),
+      h('p',{class:'muted'},'Names save as you leave each box. Scores stay with each person even if you rename them.')),
+    h('div',{class:'card'},h('h3',null,'About'),
+      h('p',{class:'muted'},'Everything saves on this phone only. Each phone keeps its own scores, so pick one phone as the scorekeeper for shared games.'),
+      h('button',{class:'btn warn',onclick:function(){if(confirm('Erase every score and card on this phone?')){S.games={};save();location.hash='#/'}}},'Reset all games'))]}
+
+function route(){
+  var hs=location.hash.replace(/^#\/?/,'');var parts=hs.split('/');var out;
+  if(parts[0]==='g')out=gameView(parts[1]);
+  else if(parts[0]==='settings')out=settings();
+  else out=home();
+  app.innerHTML='';app.appendChild(h('div',null,out));
+}
+function refresh(){var y=window.scrollY;route();window.scrollTo(0,y)}
+window.addEventListener('hashchange',function(){route();window.scrollTo(0,0)});
+route();
+
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(function(){});
+})();
+</script>
+</body>
+</html>
