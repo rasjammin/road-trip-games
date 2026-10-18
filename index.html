@@ -269,17 +269,17 @@ var GROUPS=[
   {id:'home',label:'Home stretch'}];
 
 var GAMES=[
-{id:'cows',group:'spot',ico:'🐄',title:'My Cows',blurb:'Count cows on your side. Cemeteries wipe out your herd.',
- phones:"One phone keeps count: Natalie's. Everyone else just shouts out cows on their side.",
- rules:['Each side of the car counts the cows on their side.','Pass a cemetery on your side and you lose your whole herd. Back to zero.','Most cows when you pull into the driveway wins.','Arguments about whether it was a cow or a horse are settled by the driver.'],
+{id:'cows',group:'spot',ico:'🐄',title:'My Cows',blurb:'1 point for every cow pasture on your side. Cemeteries cost you a quarter.',
+ phones:"One phone keeps score: Natalie's. Everyone else just shouts out cow pastures on their side.",
+ rules:['Each side of the car scores on their side of the road.','1 point for every pasture or ranch with cows in it. 2 cows or 200 cows, it is still 1 point.','Pass a cemetery on your side and you lose a quarter of your points (rounded up, so a cemetery always costs at least 1).','Most points when you pull into the driveway wins.','Arguments about whether it was a cow or a horse are settled by the driver.'],
  body:function(st){st.left=st.left||0;st.right=st.right||0;st.lname=st.lname||'Left side';st.rname=st.rname||'Right side';
   function side(k,nk){return h('div',{class:'card'},
     h('input',{value:st[nk],onchange:function(e){st[nk]=e.target.value;save()}}),
     h('div',{class:'big'},st[k]),
-    h('div',{class:'row center'},[1,5,10].map(function(n){return h('button',{class:'btn',onclick:act(function(){st[k]+=n})},'+'+n)})),
+    h('div',{class:'row center'},h('button',{class:'btn',style:'min-width:150px;font-size:20px',onclick:act(function(){st[k]+=1})},'\uD83D\uDC04 +1 pasture')),
     h('div',{class:'spacer'}),
     h('div',{class:'row center'},h('button',{class:'btn alt',onclick:act(function(){st[k]=Math.max(0,st[k]-1)})},'-1'),
-      h('button',{class:'btn warn',onclick:act(function(){if(confirm('Cemetery on '+st[nk]+'? Herd goes to zero.')){st.log=(st.log||[]).concat(st[nk]+' lost '+st[k]+' cows');st[k]=0}})},'Cemetery!')))}
+      h('button',{class:'btn warn',onclick:act(function(){var loss=Math.ceil(st[k]/4);if(!loss)return;if(confirm('Cemetery on '+st[nk]+'? Lose '+loss+' of '+st[k]+' points.')){st.log=(st.log||[]).concat(st[nk]+' lost '+loss+(loss===1?' point (':' points (')+st[k]+' to '+(st[k]-loss)+')');st[k]-=loss}})},'Cemetery!')))}
   return [h('div',{class:'herd'},side('left','lname'),side('right','rname')),
     st.log&&st.log.length?h('div',{class:'card'},h('h3',null,'Cemetery casualties'),st.log.map(function(l){return h('div',{class:'muted'},'☠ '+l)})):null,
     h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Start a new game?')){st.left=0;st.right=0;st.log=[]}})},'New game')]}},
