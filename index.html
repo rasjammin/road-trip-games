@@ -211,6 +211,11 @@ function outTracker(st,key,title){
     h('div',{class:'spacer'}),
     h('button',{class:'btn alt',onclick:act(function(){st[key]={}})},'New round'))}
 
+function shareText(title,text){
+  function copied(){alert('Copied. Paste it into Notes or a text.')}
+  function fallback(){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(copied,function(){alert('Could not copy automatically. Press and hold the text on screen to copy it.')})}else alert('Press and hold the text on screen to copy it.')}
+  if(navigator.share){navigator.share({title:title,text:text}).catch(function(e){if(!e||e.name!=='AbortError')fallback()})}else fallback()}
+function saveBtn(title,getText){return h('button',{class:'btn wide',style:'margin-top:8px',onclick:function(){shareText(title,getText())}},'\uD83D\uDCBE Save / share')}
 function levelPicker(st,note){st.level=st.level||3;
   return h('div',{class:'card'},h('h3',null,'Level'),
     h('div',{class:'chips'},[1,2,3,4,5].map(function(n){return h('button',{class:'chip'+(st.level===n?' on':''),onclick:act(function(){st.level=n})},'Level '+n)})),
@@ -381,7 +386,8 @@ var GAMES=[
     return [h('div',{class:'card'},h('h3',null,'The whole story'),
       starter?h('p',{style:'font-size:20px;line-height:1.5;margin:6px 0 12px'},starter.replace(/\.\.\.$/,'.')):null,
       st.lines.map(function(l){return h('p',{style:'font-size:20px;line-height:1.5;margin:0 0 12px'},l.text,h('span',{class:'muted',style:'font-size:13px'},'  - '+l.who))}),
-      !starter&&!st.lines.length?h('div',{class:'prompt dim'},'Nothing typed yet.'):null),
+      !starter&&!st.lines.length?h('div',{class:'prompt dim'},'Nothing typed yet.'):null,
+      st.lines.length?saveBtn('Our story',function(){return (starter?starter.replace(/\.\.\.$/,'.')+'\n':'')+st.lines.map(function(l){return l.text+' ('+l.who+')'}).join('\n')}):null),
       h('button',{class:'btn wide',onclick:act(function(){st.reading=false})},'Back to the game')];
   }
   var prefix=word+', ';
@@ -402,13 +408,35 @@ var GAMES=[
     h('button',{class:'btn sun wide',style:'font-size:19px;min-height:56px',onclick:act(function(){st.reading=true;window.scrollTo(0,0)})},'📖 Read the whole story')]}},
 
 {id:'lastletter',group:'all',ico:'🔗',title:'Last Letter',blurb:'Each answer starts with the last letter of the one before.',
- phones:'One phone runs the timer and marks who is out.',
- rules:['Pick a category. First person names something in it.','The next person names something that starts with the LAST letter of that answer. Texas, then San Antonio, then Odessa...','No repeats. If the timer runs out before you answer, you are out.','Pick a level for the timer: Level 1 gives 20 seconds, Level 5 gives 5.','Last one standing wins.'],
- body:function(st){st.cat=st.cat||LAST_CATS[0];
+ phones:'One phone runs the timer, types each answer and marks who is out.',
+ rules:['Pick a category. First person names something in it.','The next person names something that starts with the LAST letter of that answer. Texas, then San Antonio, then Odessa...','No repeats. If the timer runs out before you answer, you are out.','The phone-holder can type each answer. The app shows the letter the next answer needs and catches repeats. If it flags something that should count, tap Add again to add it anyway.','Pick a level for the timer: Level 1 gives 20 seconds, Level 5 gives 5.','Last one standing wins.'],
+ body:function(st){st.cat=st.cat||LAST_CATS[0];st.chain=st.chain||[];
   st.level=st.level||3;
+  function lastLetter(w){var m=w.toUpperCase().match(/[A-Z](?=[^A-Z]*$)/);return m?m[0]:''}
+  function firstLetter(w){var m=w.toUpperCase().match(/[A-Z]/);return m?m[0]:''}
+  var need=st.chain.length?lastLetter(st.chain[st.chain.length-1]):'';
+  var inp=h('input',{placeholder:need?'Starts with '+need+'...':'First answer',autocomplete:'off'});
+  function add(){var v=inp.value.trim();if(!v)return;
+    var norm=function(x){return x.toLowerCase().replace(/[^a-z0-9]/g,'')};
+    var msg='';
+    if(st.chain.some(function(c){return norm(c)===norm(v)}))msg='Repeat! '+v+' was already said.';
+    else if(need&&firstLetter(v)!==need)msg=v+' does not start with '+need+'.';
+    if(msg&&!(st.warn&&st.warn.text===v)){st.warn={text:v,msg:msg};save();refresh();return}
+    st.warn=null;st.chain.push(v);save();refresh();var t=T.lastletter;if(t){t.reset();t.start()}}
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')add()});
+  if(st.warn)setTimeout(function(){inp.value=st.warn.text},0);
   return [h('div',{class:'card'},h('h3',null,'Category'),chipPick(LAST_CATS,st.cat,function(c){st.cat=c})),
     levelPicker(st,function(l){return TURN_SECS[l-1]+' seconds per answer'}),
-    h('div',{class:'card'},timer('lastletter',TURN_SECS[st.level-1],{beepAt:3})),
+    h('div',{class:'card'},
+      h('div',{class:'sub'},need?'Next answer starts with':'Say anything in the category to start'),
+      need?h('div',{class:'big',style:'font-size:80px;color:var(--sun)'},need):null,
+      timer('lastletter',TURN_SECS[st.level-1],{beepAt:3}),
+      h('div',{class:'row',style:'margin-top:8px'},h('div',{class:'grow'},inp),h('button',{class:'btn',onclick:add},'Add')),
+      st.warn?h('div',{class:'sub',style:'color:var(--bad);font-weight:800;font-size:15px;margin-top:6px'},st.warn.msg+' Tap Add again to count it anyway.'):null,
+      st.chain.length?h('div',{style:'margin-top:10px;line-height:1.7'},st.chain.map(function(c,i){return h('span',{class:'pill',style:'margin:2px'},(i+1)+'. '+c)})):null,
+      h('div',{class:'row',style:'margin-top:8px'},
+        st.chain.length?h('button',{class:'btn alt',onclick:act(function(){st.chain.pop();st.warn=null})},'Undo last'):null,
+        h('button',{class:'btn alt',onclick:act(function(){st.chain=[];st.warn=null;st.out={}})},'New chain'))),
     outTracker(st,'out')]}},
 
 {id:'twotruths',group:'all',ico:'🤥',title:'Two Truths and a Lie',blurb:'Weekend edition. Everything has to be about this trip.',
@@ -517,10 +545,24 @@ var GAMES=[
       st.x>=3?h('div',{class:'sub',style:'font-weight:800'},'Three strikes. Other team: one chance to steal.'):null),
     scoreboard(st,'s',teams(),[1,5])]}},
 
-{id:'history',group:'parents',ico:'📖',title:'How Did That Happen?',blurb:'The kids ask. You two tell the family stories.',
- phones:'One phone. A kid reads the questions to Mom and Dad.',
- rules:['Kids draw a card and ask Mom and Dad the question.','Both parents answer. If your stories do not match, that is the best part.','Follow-up questions are encouraged.','No points. This one is just for the stories.'],
- body:function(st){var qs=HISTORY.concat(kids().map(function(k){return 'What was '+k.label+' like as a baby?'}));return [deck(st,'d',qs,{empty:'Tap Draw for a question for Mom and Dad'})]}},
+{id:'history',group:'parents',ico:'📖',title:'How Did That Happen?',blurb:'The kids ask. You two tell the family stories. Save them for keeps.',
+ phones:'One phone. A kid reads the questions to Mom and Dad, and can type the answers as you tell them (optional).',
+ rules:['Kids draw a card and ask Mom and Dad the question.','Both parents answer. If your stories do not match, that is the best part.','Follow-up questions are encouraged.','Want to keep them? Type the answer under each question. Tap Read all the stories to see every one, and Save / share to send them to Notes or the family text.','No points. This one is just for the stories.'],
+ body:function(st){var qs=HISTORY.concat(kids().map(function(k){return 'What was '+k.label+' like as a baby?'}));st.ans=st.ans||{};
+  var answered=qs.filter(function(q){return(st.ans[q]||'').trim()});
+  function allText(){return 'Family stories from the Mustang Island drive\n\n'+answered.map(function(q){return q+'\n'+st.ans[q].trim()}).join('\n\n')}
+  if(st.reading){
+    return [h('div',{class:'card'},h('h3',null,'Our family stories'),
+      answered.length?answered.map(function(q){return h('div',{style:'margin:0 0 16px'},h('div',{style:'font-weight:800;font-size:17px'},q),h('div',{style:'font-size:18px;line-height:1.5;white-space:pre-wrap'},st.ans[q].trim()))}):h('div',{class:'prompt dim'},'No answers typed yet.'),
+      answered.length?saveBtn('Family stories',allText):null),
+      h('button',{class:'btn alt wide',onclick:act(function(){st.reading=false})},'Back to the questions')];
+  }
+  var d=st.d||{};var q=d.cur!=null&&d.cur>=0&&d.cur<qs.length?qs[d.cur]:null;
+  return [deck(st,'d',qs,{empty:'Tap Draw for a question for Mom and Dad'}),
+    q?h('div',{class:'card'},h('h3',null,'Their answer (optional)'),
+      h('textarea',{rows:5,placeholder:'Type what Mom and Dad say...',value:st.ans[q]||'',oninput:function(e){st.ans[q]=e.target.value;save()}}),
+      h('div',{class:'sub'},'Saves as you type.')):null,
+    h('button',{class:'btn sun wide',style:'font-size:19px;min-height:56px',onclick:act(function(){st.reading=true;window.scrollTo(0,0)})},'📖 Read all the stories'+(answered.length?' ('+answered.length+')':''))]}},
 
 {id:'birthday',group:'aria',ico:'🎂',title:"Aria's Birthday 20 Questions",blurb:'She thinks of something she wants. Everyone guesses.',
  phones:"One phone counts the questions. Not Aria's, since she is the one thinking.",
@@ -529,15 +571,30 @@ var GAMES=[
 
 {id:'awards',group:'home',ico:'🏆',title:'Weekend Awards',blurb:'The car votes on the best (and worst) of the trip.',
  phones:"Natalie's phone. Read each award out loud, let everyone nominate, then tap a name once for each vote.",
- rules:['Go through each award. Everyone nominates someone and says why.','Then vote: tap a name once for each vote.','Most votes wins. Ties: Aria breaks them.','Add your own awards at the bottom.'],
- body:function(st){st.v=st.v||{};st.extra=st.extra||[];var list=AWARDS.concat(st.extra);
+ rules:['Go through each award. Everyone nominates someone and says why.','Then vote: tap a name once for each vote.','Most votes wins. Ties: Aria breaks them.','Type why the winner won (optional), then tap Read the awards at the end to announce them all. Save / share sends the list to Notes or the family text.','Add your own awards at the bottom.'],
+ body:function(st){st.v=st.v||{};st.extra=st.extra||[];st.why=st.why||{};var list=AWARDS.concat(st.extra);
+  function result(a){var v=st.v[a]||{};var max=0;players().forEach(function(p){max=Math.max(max,v[p.id]||0)});
+    var lead=players().filter(function(p){return max>0&&(v[p.id]||0)===max});
+    return{who:lead.length===1?lead[0].label:lead.length>1?'Tie: '+lead.map(function(p){return p.label}).join(' and '):'',votes:max,why:(st.why[a]||'').trim()}}
+  if(st.reading){
+    var done=list.filter(function(a){return result(a).who});
+    var txt=function(){return 'Mustang Island Weekend Awards\n\n'+done.map(function(a){var r=result(a);return a+': '+r.who+(r.why?' - '+r.why:'')}).join('\n')};
+    return [h('div',{class:'card'},h('h3',null,'\uD83C\uDFC6 The Weekend Awards'),
+      done.length?done.map(function(a){var r=result(a);return h('div',{style:'margin:0 0 14px'},h('div',{style:'font-weight:800;font-size:17px'},a),
+        h('div',{style:'font-size:20px;font-weight:700;color:var(--sea)'},r.who,h('span',{class:'muted',style:'font-weight:400'},'  ('+r.votes+(r.votes===1?' vote)':' votes)'))),
+        r.why?h('div',{style:'font-size:17px;line-height:1.4'},r.why):null)}):h('div',{class:'prompt dim'},'No votes yet.'),
+      done.length?saveBtn('Weekend Awards',txt):null),
+      h('button',{class:'btn alt wide',onclick:act(function(){st.reading=false})},'Back to voting')];
+  }
   var inp=h('input',{placeholder:'New award, like "Best Dance Move"'});
   return [list.map(function(a){var v=st.v[a]=st.v[a]||{};var max=0;players().forEach(function(p){max=Math.max(max,v[p.id]||0)});
       var leaders=players().filter(function(p){return max>0&&(v[p.id]||0)===max});
       return h('div',{class:'card'},h('h3',null,'🏅 '+a),
         h('div',{class:'chips'},players().map(function(p){return h('button',{class:'chip'+((v[p.id]||0)===max&&max>0?' on':''),onclick:act(function(){v[p.id]=(v[p.id]||0)+1})},p.label,v[p.id]?h('small',null,v[p.id]):null)})),
         h('div',{class:'row',style:'margin-top:8px'},h('div',{class:'grow muted'},leaders.length===1?'Winner: '+leaders[0].label:leaders.length>1?'Tie! Aria breaks it.':'No votes yet'),
-          h('button',{class:'btn alt',onclick:act(function(){st.v[a]={}})},'Clear')))}),
+          h('button',{class:'btn alt',onclick:act(function(){st.v[a]={}})},'Clear')),
+        h('input',{style:'margin-top:8px',placeholder:'Why did they win? (optional)',value:st.why[a]||'',oninput:function(e){st.why[a]=e.target.value;save()}}))}),
+    h('button',{class:'btn sun wide',style:'font-size:19px;min-height:56px',onclick:act(function(){st.reading=true;window.scrollTo(0,0)})},'\uD83C\uDFC6 Read the awards'),
     h('div',{class:'card'},h('h3',null,'Add an award'),h('div',{class:'row'},h('div',{class:'grow'},inp),
       h('button',{class:'btn',onclick:function(){var t=inp.value.trim();if(t&&list.indexOf(t)<0){st.extra.push(t);save();refresh()}}},'Add')))]}},
 
