@@ -278,7 +278,7 @@ var GAMES=[
     h('div',{class:'big'},st[k]),
     h('div',{class:'row center'},h('button',{class:'btn',style:'min-width:150px;font-size:20px',onclick:act(function(){st[k]+=1})},'\uD83D\uDC04 +1 pasture')),
     h('div',{class:'spacer'}),
-    h('div',{class:'row center'},h('button',{class:'btn alt',onclick:act(function(){st[k]=Math.max(0,st[k]-1)})},'-1'),
+    h('div',{class:'row center'},h('button',{class:'btn alt',style:'font-size:14px;min-height:40px;padding:8px 14px',onclick:act(function(){st[k]=Math.max(0,st[k]-1)})},'Undo'),
       h('button',{class:'btn warn',onclick:act(function(){var loss=Math.ceil(st[k]/4);if(!loss)return;if(confirm('Cemetery on '+st[nk]+'? Lose '+loss+' of '+st[k]+' points.')){st.log=(st.log||[]).concat(st[nk]+' lost '+loss+(loss===1?' point (':' points (')+st[k]+' to '+(st[k]-loss)+')');st[k]-=loss}})},'Cemetery!')))}
   return [h('div',{class:'herd'},side('left','lname'),side('right','rname')),
     st.log&&st.log.length?h('div',{class:'card'},h('h3',null,'Cemetery casualties'),st.log.map(function(l){return h('div',{class:'muted'},'☠ '+l)})):null,
