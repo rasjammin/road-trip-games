@@ -400,7 +400,7 @@ var GAMES=[
     outTracker(st,'out'),
     h('button',{class:'btn alt wide',onclick:act(function(){st.chain=[];st.out={}})},'New chain')]}},
 
-{id:'ghost',group:'big',ico:'👻',title:'Ghost / Superghost',blurb:'Spell without finishing a word. Superghost lets you add to either end.',
+{id:'ghost',group:'all',ico:'👻',title:'Ghost / Superghost',blurb:'Spell without finishing a word. Superghost lets you add to either end.',
  phones:"One phone keeps track of the letters and everyone's G-H-O-S-T.",
  rules:['Take turns adding one letter to a growing word.','If you finish a real word (4+ letters), you get a letter of G-H-O-S-T.','You must always have a real word in mind. If you think someone is bluffing, challenge them. If they cannot name a real word, they get the letter. If they can, you do.','Superghost: you can add your letter to the front OR the back.','Spell GHOST and you are out. Last one left wins.'],
  body:function(st){st.mode=st.mode||'Ghost';st.l=st.l||{};st.frag=st.frag||'';
@@ -544,7 +544,7 @@ var PLAN=[
  {stage:'Middle of the drive: games',items:[
    ['categories',"Fast and loud. You tap Spin and read it out."],
    ['movie',"Everybody plays. Dad too, by voice."],
-   ['ghost',"Spelling battle for the big kids."],
+   ['ghost',"Spelling battle. Everybody plays, Dad too, by voice."],
    ['lastletter',"Try Texas towns for hard mode."]]},
  {stage:'Parents in the game',items:[
    ['year',"You DJ your old songs through the car speakers. Kids guess the year."],
