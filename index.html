@@ -418,13 +418,13 @@ var GAMES=[
 
 {id:'categories',group:'big',ico:'⚡',title:'Categories, 5 Seconds',blurb:'A category, a letter, five seconds. Go.',
  phones:'One phone. The scorekeeper taps Spin, reads the category and letter out loud, and keeps score.',
- rules:['Tap Spin for a category and a letter. The timer starts on its own.','The person up has 5 seconds to name something in that category starting with that letter.','Get it and you score. Miss and it passes to the next person.','Whataburger is banned. Forever.'],
+ rules:['Tap Spin for a category and a letter. The timer starts on its own.','The person up has 5 seconds to name something in that category starting with that letter.','Get it and you score. Miss and it passes to the next person.','If you get Fast food chains with the letter W, Whataburger is banned. Too easy.'],
  body:function(st){
   return [turnPicker(st,'turn'),
     h('div',{class:'card'},
       h('div',{class:'prompt',style:'min-height:60px;padding:6px'},st.cat||'Tap Spin'),
       st.letter?h('div',{class:'big',style:'font-size:80px;color:var(--sun)'},st.letter):null,
-      st.cat==='Fast food chains'?h('div',{class:'sub',style:'color:var(--bad);font-weight:800'},'Whataburger is banned.'):null,
+      st.cat==='Fast food chains'&&st.letter==='W'?h('div',{class:'sub',style:'color:var(--bad);font-weight:800'},'Whataburger is banned.'):null,
       timer('categories',5,{beepAt:4}),
       h('button',{class:'btn sun wide',onclick:function(){st.cat=CATEGORIES[rnd(CATEGORIES.length)];st.letter=LETTERS[rnd(LETTERS.length)];save();refresh();var t=T.categories;if(t){t.reset();t.start()}}},'Spin')),
     scoreboard(st,'s',players())]}},
