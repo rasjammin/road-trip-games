@@ -283,7 +283,7 @@ var GROUPS=[
 
 var GAMES=[
 {id:'cows',group:'spot',ico:'🐄',title:'My Cows',blurb:'1 point for every cow pasture on your side. Cemeteries cost you a quarter.',
- phones:"One phone keeps score: Natalie's. Everyone else just shouts out cow pastures on their side.",
+ phones:"One phone keeps score: Kaitlan's. Everyone else just shouts out cow pastures on their side.",
  rules:['Each side of the car scores on their side of the road.','1 point for every pasture or ranch with cows in it. 2 cows or 200 cows, it is still 1 point.','Pass a cemetery on your side and you lose a quarter of your points (rounded up, so a cemetery always costs at least 1).','Most points when you pull into the driveway wins.','Arguments about whether it was a cow or a horse are settled by the driver.'],
  body:function(st){st.left=st.left||0;st.right=st.right||0;st.lname=st.lname||'Left side';st.rname=st.rname||'Right side';st.hist=st.hist||{left:[],right:[]};st.log=st.log||[];
   function side(k,nk){var hist=st.hist[k];var last=hist[hist.length-1];return h('div',{class:'card'},
@@ -356,7 +356,7 @@ var GAMES=[
     h('button',{class:'btn alt wide',onclick:act(function(){st.locked=false;st.word='';st.solved=false;st.n=1})},'New word (next word-holder)')]}},
 
 {id:'hotseat',group:'all',ico:'🔥',title:'Hot Seat',blurb:'Three minutes in the seat. Everyone asks. Two passes.',
- phones:"Natalie's phone runs the timer and the passes. Anyone can draw question cards on their own phone.",
+ phones:"Kaitlan's phone runs the timer and the passes. Anyone can draw question cards on their own phone.",
  rules:['One person is in the hot seat for 3 minutes.','Everyone else asks anything they want (draw a card if you are stuck).','The hot-seat person has to answer honestly, but gets 2 passes.','When time is up, the next person takes the seat.'],
  body:function(st){st.passes=st.passes==null?2:st.passes;
   return [turnPicker(st,'turn','In the hot seat'),
@@ -490,7 +490,7 @@ var GAMES=[
     scoreboard(st,'s',players())]}},
 
 {id:'music',group:'all',ico:'🎤',title:'Music Showdown',blurb:'Hum it, finish the lyric, name that tune.',
- phones:"Hum It: the hummer draws a secret song on their own phone. Finish the Lyric and Name That Tune: one DJ (Natalie or a kid) plays songs through the car speakers from their phone. Natalie keeps score on her phone.",
+ phones:"Hum It: the hummer draws a secret song on their own phone. Finish the Lyric and Name That Tune: one DJ plays songs through the car speakers from their phone. Kaitlan keeps score on her phone.",
  rules:['Three ways to play. Pick a mode with the buttons below and switch whenever you want.','Hum It: the hummer taps Draw for a secret song (or picks their own) and hums it. No words allowed. First to name the song gets a point. If somebody gets it before the timer runs out, the hummer gets a point too.','Finish the Lyric: the DJ plays a song through the car speakers and pauses it in the middle of a line. First person to sing the next line right gets a point. Hit play to check.','Name That Tune: the DJ plays just the first few seconds of a song. First to name the song gets a point, and naming the artist too is a bonus point.','Levels: Level 1 is the easy version (more hum time, longer clips, pause on the chorus). Level 5 is the hard one (15 seconds to hum, 1-second clips, pause in a verse).','The song cards mix pop, hip hop, R&B, Latin, country, rock and Disney. With everyone in the car, play the clean versions.','Dad is driving. He guesses by voice on all three.'],
  body:function(st){st.mode=st.mode||'Hum It';st.hum=st.hum||{cur:-1,seen:[],show:false};var hm=st.hum;st.level=st.level||3;var lv=st.level;
   var modes=['Hum It','Finish the Lyric','Name That Tune'];
@@ -512,12 +512,12 @@ var GAMES=[
   var lvNote=function(l){return st.mode==='Hum It'?HUM_SECS[l-1]+' seconds to hum':st.mode==='Name That Tune'?CLIP_SECS[l-1]+(CLIP_SECS[l-1]===1?'-second clips':'-second clips'):(l<=2?'Pause before the chorus':l===3?'Pause mid-line':'Pause mid-verse')};
   return [top,levelPicker(st,lvNote),mid,scoreboard(st,'s',players(),[1,2])]}},
 {id:'dj',group:'all',ico:'🎧',title:'DJ Battle',blurb:'Everyone picks a song for the theme. The car rates it.',
- phones:'Each person plays their song from their own phone, through the car speakers if you can. Natalie keeps score on her phone.',
+ phones:'Each person plays their song from their own phone, through the car speakers if you can. Kaitlan keeps score on her phone.',
  rules:['Draw a theme.','Each person picks a song that fits and plays about 30 seconds of it.','Everyone else rates it 1 to 10 on their fingers. Add up the ratings and put them on the scoreboard.','Highest total after a few rounds is the DJ of the trip.','Ties: Aria breaks them.'],
  body:function(st){return [deck(st,'theme',DJ_THEMES,{title:'Theme',empty:'Tap Draw for a theme'}),scoreboard(st,'s',players(),[1,5,10])]}},
 
 {id:'knows',group:'parents',ico:'👨‍👩‍👧‍👦',title:'Who Knows Mom Best / Dad Best',blurb:'The parent writes the answer secretly. The kids race to guess.',
- phones:"Natalie's phone. For a question about Mom, Natalie types her answer secretly, then the kids guess. For a question about Dad (driving), the kids guess first, then Dad says the answer out loud.",
+ phones:"Mom's phone for this one. For a question about Mom, she types her answer secretly, then the kids guess (Kaitlan plays along). For a question about Dad (driving), the kids guess first, then Dad says the answer out loud.",
  rules:['Pick Mom or Dad. Draw a question.','Mom: type your real answer secretly on this phone while the kids look away. Dad is driving, so for his questions the kids guess first and then he says the answer out loud.','Kids shout out guesses. First right answer gets a point.','Tap Reveal to settle it. Then switch parents.'],
  body:function(st){st.who=st.who||'Mom';var X=st.who;var qs=KNOWS_Q.map(function(q){return q.replace(/\{X\}/g,X)});var key='d'+X;
   return [h('div',{class:'toggle'},['Mom','Dad'].map(function(m){return h('button',{class:st.who===m?'on':'',onclick:act(function(){st.who=m})},'Who knows '+m+' best')})),
@@ -526,7 +526,7 @@ var GAMES=[
     scoreboard(st,'s',kids())]}},
 
 {id:'year',group:'parents',ico:'📻',title:'Parents vs. Kids: Guess the Year',blurb:"Your high school years vs. their playlists.",
- phones:'Natalie is the DJ: the song list is on her phone and the music plays through the car speakers. Kids guess out loud. Natalie keeps score on the same phone.',
+ phones:'Mom is the DJ for this one: the song list is on her phone (the kids would see the answers) and the music plays through the car speakers. Kids guess out loud. Mom keeps score on the same phone.',
  rules:['Round 1: the parent DJ taps Next song (kids look away), plays it, and the kids guess the year.','Exact year: 2 points. Within one year: 1 point. Name the artist: 1 more.','Round 2: the kids DJ their own songs, and the parents guess the artist (1 point) and the title (1 point).','Years below are the year each song hit, roughly. Arguments are part of the game.'],
  body:function(st){var d=st.d||{};var cur=d.cur;var song=cur!=null&&cur>=0?SONGS[cur]:null;
   return [deck(st,'d',SONGS.map(function(s){return s[1]+' - '+s[2]}),{title:'Round 1: the 90s and early 2000s',empty:'Parent DJ: tap Draw (kids, look away)',next:'Next song',
@@ -570,7 +570,7 @@ var GAMES=[
  body:function(st){return twentyQ(st,null)}},
 
 {id:'awards',group:'home',ico:'🏆',title:'Weekend Awards',blurb:'The car votes on the best (and worst) of the trip.',
- phones:"Natalie's phone. Read each award out loud, let everyone nominate, then tap a name once for each vote.",
+ phones:"Kaitlan's phone. Read each award out loud, let everyone nominate, then tap a name once for each vote.",
  rules:['Go through each award. Everyone nominates someone and says why.','Then vote: tap a name once for each vote.','Most votes wins. Ties: Aria breaks them.','Type why the winner won (optional), then tap Read the awards at the end to announce them all. Save / share sends the list to Notes or the family text.','Add your own awards at the bottom.'],
  body:function(st){st.v=st.v||{};st.extra=st.extra||[];st.why=st.why||{};var list=AWARDS.concat(st.extra);
   function result(a){var v=st.v[a]||{};var max=0;players().forEach(function(p){max=Math.max(max,v[p.id]||0)});
@@ -599,7 +599,7 @@ var GAMES=[
       h('button',{class:'btn',onclick:function(){var t=inp.value.trim();if(t&&list.indexOf(t)<0){st.extra.push(t);save();refresh()}}},'Add')))]}},
 
 {id:'arrival',group:'home',ico:'⏰',title:'Guess the Arrival Time',blurb:'Lock in guesses before leaving. Closest picks dinner.',
- phones:"Natalie's phone ONLY. Before you leave, type all six guesses into it, then tap Lock. In the driveway, tap We're home!",
+ phones:"Kaitlan's phone ONLY. Before you leave, type all six guesses into it, then tap Lock. In the driveway, tap We're home!",
  rules:['Before you leave the island, everyone enters a guess for what time you pull into the driveway.','Lock the guesses so nobody can change them.','Tap "We\'re home!" in the driveway.','Closest guess picks dinner.'],
  body:function(st){st.g=st.g||{};
   function mins(s){var p=s.split(':');return +p[0]*60+ +p[1]}
@@ -619,7 +619,7 @@ var GAMES=[
     h('button',{class:'btn alt wide',onclick:act(function(){if(confirm('Clear all guesses?')){st.g={};st.locked=false;st.home=null}})},'Start over')]}},
 
 {id:'quiet',group:'home',ico:'🤫',title:'The Quiet Game',blurb:"The parents' secret weapon. Save it for the last hour.",
- phones:'One phone. Natalie taps Start.',
+ phones:'One phone. Kaitlan taps Start.',
  rules:['Start the timer. Nobody talks.','First person to make a sound loses.','Try to beat the car record.','The driver is exempt for safety reasons. Obviously.'],
  body:function(st){st.best=st.best||0;
   return [h('div',{class:'card'},
@@ -645,7 +645,7 @@ function shareBtn(g,label){return h('button',{class:'btn alt'+(label?' wide':'')
 var PLAN=[
  {stage:'In the driveway, before you leave',items:[
    ['arrival',"Ask everyone for their guess, type all six on YOUR phone, tap Lock."],
-   ['bingo',"Send to the kids. Bingo runs in the background the whole drive."],
+   ['bingo',"Send to everyone. Bingo runs in the background the whole drive."],
    ['cows',"Start the cow count on your phone. It runs all trip."],
    ['plates',"Optional: send to anyone who wants a side race."]]},
  {stage:'First hour: warm-up',items:[
@@ -659,10 +659,10 @@ var PLAN=[
    ['ghost',"Spelling battle. Everybody plays, Dad too, by voice."],
    ['lastletter',"Try Texas towns for hard mode."]]},
  {stage:'Parents in the game',items:[
-   ['year',"You DJ your old songs through the car speakers. Kids guess the year."],
-   ['knows',"Who knows Mom best, then Dad."],
+   ['year',"Hand this one to Mom: she DJs her old songs, the kids (you too) guess the year."],
+   ['knows',"Hand to Mom for her secret answers. You play along."],
    ['feud',"Send to Danielle to host. Parents vs. kids."],
-   ['history',"Kids ask you two the family stories."]]},
+   ['history',"Ask Mom and Dad the family stories. Type the answers if you can."]]},
  {stage:'Slower stretch: talking',items:[
    ['hotseat',"3 minutes each in the seat. You run the timer."],
    ['birthday',"Aria leads. Pay attention, it is intel."],
@@ -672,17 +672,17 @@ var PLAN=[
    ['alpha',"Optional side race on their own phones."]]},
  {stage:'Last hour',items:[
    ['awards',"Vote on the best (and worst) of the weekend."],
-   ['quiet',"Your secret weapon."],
+   ['quiet',"The parents' secret weapon. Mom will love you for it."],
    ['arrival',"In the driveway: open it and tap We're home!"]]}];
 
 function hostView(){
   header('Game plan',true);
   var byId={};GAMES.forEach(function(g){byId[g.id]=g});
-  return [h('div',{class:'title'},'\uD83D\uDCCB Natalie: start here'),
+  return [h('div',{class:'title'},'\uD83D\uDCCB Kaitlan: start here'),
     h('div',{class:'card'},h('h3',null,"You're the host"),h('ul',{style:'margin:0;padding-left:20px;line-height:1.5'},
-      h('li',null,"Russell is driving. He plays by voice only and never touches a phone."),
+      h('li',null,"Dad is driving. He plays by voice only and never touches a phone. You play too, while you host."),
       h('li',null,"The games are below in a suggested order. Skip anything that is not landing and move on. There is no order you have to follow."),
-      h('li',null,h('b',null,'Open'),' opens a game on your phone. ',h('b',null,'Send'),' texts a kid the link to that exact game.'),
+      h('li',null,h('b',null,'Open'),' opens a game on your phone. ',h('b',null,'Send'),' texts someone the link to that exact game.'),
       h('li',null,"Every game page has a Phones box (whose phone does what) and How to play rules you can read out loud."),
       h('li',null,"Scores only live on the phone they were tapped on, so keep the shared scores on your phone."))),
     PLAN.map(function(sec){return h('div',{class:'group'},h('h2',null,sec.stage),sec.items.map(function(it){var g=byId[it[0]];
@@ -703,8 +703,8 @@ function home(){
   header('🏖 Road Trip Games',false);
   return [h('div',{class:'hero'},h('b',null,'Mustang Island to home'),
       h('div',null,GAMES.length+' games for '+players().length+' players.'),
-      h('a',{class:'btn sun wide',href:'#/host',style:'display:block;text-align:center;text-decoration:none;margin:10px 0 6px;line-height:24px'},'\uD83D\uDCCB Natalie: open the game plan'),
-      h('div',{class:'muted'},'Kids: Mom is running the games. Open the link she sends you, or tap any game below.'),
+      h('a',{class:'btn sun wide',href:'#/host',style:'display:block;text-align:center;text-decoration:none;margin:10px 0 6px;line-height:24px'},'\uD83D\uDCCB Kaitlan: open the game plan'),
+      h('div',{class:'muted'},'Everyone else: Kaitlan is running the games. Open the link she sends you, or tap any game below.'),
       h('div',{class:'muted',style:'margin-top:6px'},'Tip: add this to your home screen while you still have signal. It keeps working offline.')),
     GROUPS.map(function(g){var gs=GAMES.filter(function(x){return x.group===g.id});
       return h('div',{class:'group'},h('h2',null,g.label),gs.map(function(x){
